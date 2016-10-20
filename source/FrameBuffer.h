@@ -13,6 +13,6 @@ typedef struct _FrameBuffer
 	DISPENV dispEnv;
 } FrameBuffer;
 
-void FrameBuffer_Construct(FrameBuffer* pFrameBuf, int xOffset, int yOffset);
+void FrameBuffer_Construct(FrameBuffer* pSelf, int xOffset, int yOffset);
 
 #endif
