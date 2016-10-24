@@ -6,25 +6,46 @@
 #include <libgte.h>
 #include <libgpu.h>
 
-typedef struct _Mesh
+typedef enum MeshPrimType
 {
-	SVECTOR* pVerts;
-	int nVerts;
-	
-	u_long* pPrimBufs[2];
+	MESHPT_TRI_GOUR
+} MeshPrimType;
+
+struct MeshAttr
+{
+	u_char attrCode; // MeshPrimType
+	u_char nPrims;
+};
+
+struct MeshTriGour
+{
+	SVECTOR xyz0;
+	CVECTOR rgb0;
+	SVECTOR xyz1;
+	CVECTOR rgb1;
+	SVECTOR xyz2;
+	CVECTOR rgb2;
+};
+
+struct Mesh
+{
+	// Static at load time
+	u_long* pModelTris;
+	int nModelTriWords;
+	MeshAttr* pAttrs;
+	int nAttrs;
+
+	// Re-used per frame
+	u_long* pPrims[2];
 	int nUsedPrimWords[2];
-	
-	// Actually initialized to length + 1, so it can be inserted in another table
-	// while allowing primitives to use the expected length
-	unsigned long* pOrderTbls[2]; 
-	
-	int orderTblLength;
-} Mesh;
+	int maxPrimWords;
+};
 
 void Mesh_Construct(Mesh* pSelf);
-void Mesh_AllocateBuffers(Mesh* pSelf, int nVerts, int numPrimBufWords, int orderTblLength);
+void Mesh_AllocateBuffers(Mesh* pSelf, int nModelTriWords, int nPrimWords, int nAttrs);
+void Mesh_InitPrimBufs(Mesh* pSelf);
 void Mesh_PrepareDrawing(Mesh* pSelf, int frameBufIdx);
-void Mesh_InsertOrderTbl(Mesh* pSelf, int frameBufIdx, u_long* pDestOtLoc);
+void Mesh_Draw(Mesh* pSelf, int frameBufIdx, OrderingTable* pOrderTbl);
 void Mesh_Destruct(Mesh* pSelf);
 
 #endif

@@ -2,16 +2,17 @@
 #define _FRAMEBUFFER_H_
 
 #include "Global.h"
+#include "OrderingTable.h"
 
 #include <libgte.h>
 #include <libgpu.h>
 
-typedef struct _FrameBuffer
+struct FrameBuffer
 {
-	unsigned long ot[OT_LENGTH]; // Ordering table
+	OrderingTable ot;
 	DRAWENV drawEnv;
 	DISPENV dispEnv;
-} FrameBuffer;
+};
 
 void FrameBuffer_Construct(FrameBuffer* pSelf, int xOffset, int yOffset);
 
