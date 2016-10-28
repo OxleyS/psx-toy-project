@@ -1,5 +1,8 @@
 #include "OrderingTable.h"
 
+#include <libgte.h>
+#include <libgpu.h>
+
 void OrderingTable_Construct(OrderingTable* pSelf, int nEntries)
 {
   pSelf->pEntries = nEntries ? malloc3(sizeof(u_long) * nEntries) : 0;
