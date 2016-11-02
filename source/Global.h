@@ -17,5 +17,6 @@ typedef struct Mesh Mesh;
 typedef struct OrderingTable OrderingTable;
 typedef struct FrameBuffer FrameBuffer;
 typedef struct MeshTriGour MeshTriGour;
+typedef struct Camera Camera;
 
 #endif

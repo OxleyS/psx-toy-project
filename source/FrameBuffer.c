@@ -4,7 +4,7 @@ void FrameBuffer_Construct(FrameBuffer* pSelf, int xOffset, int yOffset)
 {
 	DISPENV* pDispEnv;
 
-	OrderingTable_Construct(&pSelf->ot, 0);
+	OT_Construct(&pSelf->ot, 0);
 
 	SetDefDrawEnv(&pSelf->drawEnv, xOffset, yOffset, SCREEN_WIDTH, SCREEN_HEIGHT);
 

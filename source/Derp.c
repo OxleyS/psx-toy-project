@@ -9,6 +9,8 @@
 #include "FrameBuffer.h"
 #include "Mesh.h"
 #include "Input.h"
+#include "Cube.h"
+#include "Camera.h"
 
 u_long __ramsize   = 0x00200000; // force 2 megabytes of RAM
 u_long __stacksize = 0x00004000; // force 16 kilobytes of stack
@@ -29,27 +31,7 @@ typedef enum VideoMode
 static VideoMode gVideoMode;
 
 Mesh mesh;
-SVECTOR meshVerts[6] =
-{
-	{ 0, 0, 0, 0 },
-	{ 100, 50, 0, 0 },
-	{ 100, -50, 0, 0 },
-	{ 0, 0, -10, 0 },
-	{ 100, 50, -10, 0 },
-	{ 100, -50, -10, 0 },
-};
-CVECTOR meshColors[6] =
-{
-	{ 0, 0, 255, 0 },
-	{ 255, 0, 0, 0 },
-	{ 0, 255, 0, 0 },
-	{ 255, 0, 255, 0 },
-	{ 255, 255, 0, 0 },
-	{ 0, 255, 255, 0 }
-};
-
-int xOffset = 0;
-SVECTOR rotAmt = { 0, 0, 0, 0 };
+Camera camera;
 
 void Initialize(void);
 void Update(void);
@@ -82,11 +64,6 @@ int main(void)
 
 void Initialize(void)
 {
-	int i;
-
-	MeshTriGour polys[2];
-	int baseIdx;
-
 	// 1 MB of heap space
 	InitHeap3((void*)0x800F8000, 0x00100000);
 
@@ -111,37 +88,21 @@ void Initialize(void)
 	SetDispMask(1);
 
 	FrameBuffer_Construct(gFrameBuffers, 0, 0);
-	OrderingTable_ConstructStatic(&gFrameBuffers[0].ot, gFrameBufOtEntries1, OT_LENGTH);
+	OT_ConstructStatic(&gFrameBuffers[0].ot, gFrameBufOtEntries1, OT_LENGTH);
 	FrameBuffer_Construct(gFrameBuffers + 1, 0, SCREEN_HEIGHT);
-	OrderingTable_ConstructStatic(&gFrameBuffers[1].ot, gFrameBufOtEntries2, OT_LENGTH);
+	OT_ConstructStatic(&gFrameBuffers[1].ot, gFrameBufOtEntries2, OT_LENGTH);
 
-	OrderingTable_Clear(&gFrameBuffers[0].ot);
-	OrderingTable_Clear(&gFrameBuffers[1].ot);
+	OT_Clear(&gFrameBuffers[0].ot);
+	OT_Clear(&gFrameBuffers[1].ot);
+
+	Camera_Construct(&camera);
+	camera.position.vz = 0;//-300;
+	camera.bDirty = 1;
 
 	VSync(0);
 	SwapBuffers();
 
-	Mesh_Construct(&mesh);
-	Mesh_AllocateBuffers(&mesh, (sizeof(MeshTriGour) * 2) / sizeof(u_long),
-		(sizeof(POLY_G3) * 2) / sizeof(u_long),
-		1);
-
-	for (i = 0; i < 2; i++)
-	{
-		baseIdx = i * 3;
-		polys[i].xyz0 = meshVerts[baseIdx];
-		polys[i].xyz1 = meshVerts[baseIdx + 1];
-		polys[i].xyz2 = meshVerts[baseIdx + 2];
-		polys[i].rgb0 = meshColors[baseIdx];
-		polys[i].rgb1 = meshColors[baseIdx + 1];
-		polys[i].rgb2 = meshColors[baseIdx + 2];
-	}
-
-	memcpy(mesh.pModelTris, polys, sizeof(MeshTriGour) * 2);
-	mesh.pAttrs[0].attrCode = MESHPT_TRI_GOUR;
-	mesh.pAttrs[0].nPrims = 2;
-
-	Mesh_InitPrimBufs(&mesh);
+	mesh = *Cube_AllocateMesh();
 }
 
 void Update(void)
@@ -153,32 +114,35 @@ void Update(void)
 	controllerType = Input_GetControllerType(0);
 	if (controllerType != CONTROLLER_NONE)
 	{
-		if (Input_ButtonDown(BUTTON_DUP, 0)) xOffset += 10;
+		if (Input_ButtonDown(BUTTON_DLEFT, 0)) camera.yaw -= 10;
+		if (Input_ButtonDown(BUTTON_DRIGHT, 0)) camera.yaw += 10;
+		if (Input_ButtonDown(BUTTON_DUP, 0)) camera.pitch += 10;
+		if (Input_ButtonDown(BUTTON_DDOWN, 0)) camera.pitch -= 10;
 	}
-	
-	if (xOffset > 4096) xOffset = 0;
-	rotAmt.vy = xOffset;
+	Camera_ClampRotations(&camera);
 }
 
 void SetupDraw(void)
 {
-	OrderingTable_Clear(&gpCurFrameBuf->ot);
+	OT_Clear(&gpCurFrameBuf->ot);
 }
 
 void BuildDrawCommands(void)
 {
-	MATRIX mtx, rotMtx;
+	MATRIX mtx;
+	MATRIX* pCameraMtx = Camera_GetMatrix(&camera);
 
 	Mesh_PrepareDrawing(&mesh, gCurFrameBufIdx);
 
-	MathUtil_IdentityMatrix(&mtx);
+	M_IdentityMatrix(&mtx);
 	mtx.t[2] = 300;
+	
+	M_MulMatrixTrans(&mtx, pCameraMtx);
 
-	MathUtil_ZeroMatrixTrans(&rotMtx);
-	RotMatrix_gte(&rotAmt, &rotMtx);
-
-	MulMatrix(&mtx, &rotMtx);
-
+	//M_IdentityMatrixRot(&mtx);
+	//M_ZeroMatrixTrans(&mtx);
+	//mtx.t[2] = 300;
+	Debug_PrintMatrix(&mtx, "final mtx");
 	SetRotMatrix(&mtx);
 	SetTransMatrix(&mtx);
 
@@ -188,7 +152,7 @@ void BuildDrawCommands(void)
 void IssueDraw(void)
 {
 	int prevBufIdx = gCurFrameBufIdx ^ 0x1;
-	OrderingTable_IssueToGpu(&gFrameBuffers[prevBufIdx].ot);
+	OT_IssueToGpu(&gFrameBuffers[prevBufIdx].ot);
 }
 
 void SwapBuffers(void)

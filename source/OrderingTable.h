@@ -10,12 +10,12 @@ struct OrderingTable
   int bStatic;
 };
 
-void OrderingTable_Construct(OrderingTable* pSelf, int nEntries);
-void OrderingTable_ConstructStatic(OrderingTable* pSelf, u_long* pMem, int nEntries);
-void OrderingTable_Clear(OrderingTable* pSelf);
-void OrderingTable_IssueToGpu(OrderingTable* pSelf);
-void OrderingTable_AddPrim(OrderingTable* pSelf, void* pPrim, int pos);
-void OrderingTable_AddOt(OrderingTable* pSelf, OrderingTable* pToAdd, int pos);
-void OrderingTable_Destruct(OrderingTable* pSelf);
+void OT_Construct(OrderingTable* pSelf, int nEntries);
+void OT_ConstructStatic(OrderingTable* pSelf, u_long* pMem, int nEntries);
+void OT_Clear(OrderingTable* pSelf);
+void OT_IssueToGpu(OrderingTable* pSelf);
+void OT_AddPrim(OrderingTable* pSelf, void* pPrim, int pos);
+void OT_AddOt(OrderingTable* pSelf, OrderingTable* pToAdd, int pos);
+void OT_Destruct(OrderingTable* pSelf);
 
 #endif

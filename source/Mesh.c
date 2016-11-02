@@ -85,7 +85,7 @@ void Mesh_Draw(Mesh* pSelf, int frameBufIdx, OrderingTable* pOrderTbl)
 	MeshAttr* pAttr;
 	u_long* pInTri = pSelf->pModelTris;
 	u_long* pOutPrim = pSelf->pPrims[frameBufIdx];
-	long otz, p, flag;
+	long otz, p, flag, clipVal;
 
 	union InTriType tt;
 	union OutPolyType pt;
@@ -100,11 +100,11 @@ void Mesh_Draw(Mesh* pSelf, int frameBufIdx, OrderingTable* pOrderTbl)
 				case MESHPT_TRI_GOUR:
 					pt.g3 = (POLY_G3*)pOutPrim;
 					SetPolyG3(pt.g3);
-					tt.mtg = (MeshTriGour*)pInTri;
-					otz = RotTransPers3(&tt.mtg->xyz0, &tt.mtg->xyz1, &tt.mtg->xyz2,
+					tt.mtg = (MeshTriGour*)pInTri;					
+					clipVal = RotAverageNclip3(&tt.mtg->xyz0, &tt.mtg->xyz1, &tt.mtg->xyz2,
 						(long*)&pt.g3->x0, (long*)&pt.g3->x1, (long*)&pt.g3->x2,
-						&p, &flag);
-					OrderingTable_AddPrim(pOrderTbl, pOutPrim, otz);
+						&p, &otz, &flag);
+					if (clipVal >= 0) OT_AddPrim(pOrderTbl, pOutPrim, otz);
 					pInTri = (u_long*)(tt.mtg + 1);
 					pOutPrim = (u_long*)(pt.g3 + 1);
 					pSelf->nUsedPrimWords[frameBufIdx] += sizeof(POLY_G3) / sizeof(u_long);
