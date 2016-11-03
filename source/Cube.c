@@ -84,6 +84,7 @@ int gnCubeTris = sizeof(gCubeTris) / sizeof(MeshTriGour);
 Mesh* Cube_AllocateMesh()
 {
     Mesh* pMesh = malloc3(sizeof(Mesh));
+
     Mesh_Construct(pMesh);
 	Mesh_AllocateBuffers(pMesh, (sizeof(MeshTriGour) * gnCubeTris) / sizeof(u_long),
 		(sizeof(POLY_G3) * gnCubeTris) / sizeof(u_long),

@@ -8,13 +8,17 @@
 
 typedef enum MeshPrimType
 {
-	MESHPT_TRI_GOUR
+	MESHPT_TRI_GOUR,
+	MESHPT_TRI_GOUR_TEX
 } MeshPrimType;
 
 struct MeshAttr
 {
 	u_char attrCode; // MeshPrimType
 	u_char nPrims;
+
+	u_short clutId;
+	u_short tpageId;
 };
 
 struct MeshTriGour
@@ -25,6 +29,19 @@ struct MeshTriGour
 	CVECTOR rgb1;
 	SVECTOR xyz2;
 	CVECTOR rgb2;
+};
+
+struct MeshTriGourTex
+{
+	SVECTOR xyz0;
+	CVECTOR rgb0;
+	u_char u0, v0;
+	SVECTOR xyz1;
+	CVECTOR rgb1;
+	u_char u1, v1;
+	SVECTOR xyz2;
+	CVECTOR rgb2;
+	u_char u2, v2;
 };
 
 struct Mesh

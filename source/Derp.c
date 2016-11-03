@@ -96,8 +96,6 @@ void Initialize(void)
 	OT_Clear(&gFrameBuffers[1].ot);
 
 	Camera_Construct(&camera);
-	camera.position.vz = 0;//-300;
-	camera.bDirty = 1;
 
 	VSync(0);
 	SwapBuffers();
@@ -139,10 +137,6 @@ void BuildDrawCommands(void)
 	
 	M_MulMatrixTrans(&mtx, pCameraMtx);
 
-	//M_IdentityMatrixRot(&mtx);
-	//M_ZeroMatrixTrans(&mtx);
-	//mtx.t[2] = 300;
-	Debug_PrintMatrix(&mtx, "final mtx");
 	SetRotMatrix(&mtx);
 	SetTransMatrix(&mtx);
 
