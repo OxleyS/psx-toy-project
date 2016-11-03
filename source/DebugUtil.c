@@ -19,7 +19,21 @@ void Debug_PrintHeader(const char* pType, const char* pName)
 
 void Debug_PrintFooter()
 {
-	printf("++++++++++++++++++++\n");
+	printf("+++++++++++++++++++++++++\n");
+}
+
+void Debug_PrintShort(short val, const char* pName)
+{
+	Debug_PrintHeaderToName("Short", pName);
+	printf(": %hd\n", val);
+	Debug_PrintFooter();
+}
+
+void Debug_PrintLong(long val, const char* pName)
+{
+	Debug_PrintHeaderToName("Long", pName);
+	printf(": %ld\n", val);
+	Debug_PrintFooter();
 }
 
 void Debug_PrintUshort(u_short val, const char* pName)
@@ -61,9 +75,32 @@ void Debug_PrintMatrix(const MATRIX* pMtx, const char* pName)
 	Debug_PrintFooter();
 }
 
+void Debug_PrintSvector(const SVECTOR* pVec, const char* pName)
+{
+	Debug_PrintHeaderToName("SVECTOR", pName);
+	printf(": %hd, %hd, %hd\n", pVec->vx, pVec->vy, pVec->vz);
+	Debug_PrintFooter();
+}
+
 void Debug_PrintOt(const OrderingTable* pOt, const char* pName)
 {
 	Debug_PrintHeader("OT", pName);
 	DumpOTag(pOt->pEntries + (pOt->nEntries - 1));
+	Debug_PrintFooter();
+}
+
+void Debug_PrintPolyGT3(const POLY_GT3* pPoly, const char* pName)
+{
+	Debug_PrintHeader("PolyGT3", pName);
+	printf("XY0: %hd, %hd\n", pPoly->x0, pPoly->y0);
+	printf("RGB0: %hhu, %hhu, %hhu\n", pPoly->r0, pPoly->g0, pPoly->b0);
+	printf("UV0: %hhu, %hhu\n", pPoly->u0, pPoly->v0);
+	printf("XY1: %hd, %hd\n", pPoly->x1, pPoly->y1);
+	printf("RGB1: %hhu, %hhu, %hhu\n", pPoly->r1, pPoly->g1, pPoly->b1);
+	printf("UV1: %hhu, %hhu\n", pPoly->u1, pPoly->v1);
+	printf("XY2: %hd, %hd\n", pPoly->x2, pPoly->y2);
+	printf("RGB2: %hhu, %hhu, %hhu\n", pPoly->r2, pPoly->g2, pPoly->b2);
+	printf("UV2: %hhu, %hhu\n", pPoly->u2, pPoly->v2);
+	printf("CLUT: %hu, TPage: %hu\n", pPoly->clut, pPoly->tpage);
 	Debug_PrintFooter();
 }

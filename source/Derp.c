@@ -10,6 +10,7 @@
 #include "Mesh.h"
 #include "Input.h"
 #include "Cube.h"
+#include "Checkerboard.h"
 #include "Camera.h"
 
 u_long __ramsize   = 0x00200000; // force 2 megabytes of RAM
@@ -31,7 +32,22 @@ typedef enum VideoMode
 static VideoMode gVideoMode;
 
 Mesh mesh;
+Mesh checker;
 Camera camera;
+
+MeshTriGourTex plane[2] =
+{
+	{ 
+		{ -150, 64, -150, 0 }, { 128, 128, 128 }, 0, 64, 0,
+		{ -150, 64, 150, 0 }, { 128, 128, 128 }, 0, 0, 0,
+		{ 150, 64, -150, 0 }, { 128, 128, 128 }, 64, 64, 0
+	},
+	{ 
+		{ -150, 64, 150, 0 }, { 128, 128, 128 }, 0, 0, 0,
+		{ 150, 64, 150, 0 }, { 128, 128, 128 }, 64, 0, 0,
+		{ 150, 64, -150, 0 }, { 128, 128, 128 }, 64, 64, 0
+	}
+};
 
 void Initialize(void);
 void Update(void);
@@ -64,6 +80,8 @@ int main(void)
 
 void Initialize(void)
 {
+	u_short tpage;
+
 	// 1 MB of heap space
 	InitHeap3((void*)0x800F8000, 0x00100000);
 
@@ -78,12 +96,11 @@ void Initialize(void)
 		gVideoMode = VIDEOMODE_NTSC;
 		SetVideoMode(0);
 	}
-
 	
 	ResetGraph(0);
 	Input_Initialize(0);
 	InitGeom();
-	SetGeomScreen(SCREEN_CENTER_X);
+	SetGeomScreen(400);
 	SetGeomOffset(SCREEN_CENTER_X, SCREEN_CENTER_Y);
 	SetDispMask(1);
 
@@ -97,6 +114,17 @@ void Initialize(void)
 
 	Camera_Construct(&camera);
 
+	Checkerboard_Initialize();
+	tpage = LoadTPage(gCheckerboardRgb, 2, 0, 384, 0, gCheckerboardWidth, gCheckerboardHeight);
+	Mesh_Construct(&checker);
+	Mesh_AllocateBuffers(&checker, sizeof(MeshTriGourTex) / 2, sizeof(POLY_GT3) / 2, 1);
+	memcpy(checker.pModelTris, plane, sizeof(MeshTriGourTex) * 2);
+	checker.pAttrs[0].attrCode = MESHPT_TRI_GOUR_TEX;
+	checker.pAttrs[0].nPrims = 2;
+	checker.pAttrs[0].tpageId = tpage;
+	Mesh_InitPrimBufs(&checker);
+
+	DrawSync(0);
 	VSync(0);
 	SwapBuffers();
 
@@ -133,13 +161,13 @@ void BuildDrawCommands(void)
 	Mesh_PrepareDrawing(&mesh, gCurFrameBufIdx);
 
 	M_IdentityMatrix(&mtx);
-	mtx.t[2] = 300;
+	mtx.t[2] = 500;
 	
 	M_MulMatrixTrans(&mtx, pCameraMtx);
 
 	SetRotMatrix(&mtx);
 	SetTransMatrix(&mtx);
-
+	Mesh_Draw(&checker, gCurFrameBufIdx, &gpCurFrameBuf->ot);
 	Mesh_Draw(&mesh, gCurFrameBufIdx, &gpCurFrameBuf->ot);
 }
 

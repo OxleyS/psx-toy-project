@@ -42,5 +42,5 @@ void M_MulMatrixTrans(MATRIX* pMtx1, MATRIX* pMtx2)
 	MulMatrix(pMtx1, pMtx2);
 
 	// Handle the translation part
-	ApplyMatrixLV(pMtx2, pMtx1->t, pMtx1->t);
+	ApplyMatrixLV(pMtx2, (VECTOR*)pMtx1->t, (VECTOR*)pMtx1->t);
 }

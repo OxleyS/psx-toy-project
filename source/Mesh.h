@@ -36,12 +36,15 @@ struct MeshTriGourTex
 	SVECTOR xyz0;
 	CVECTOR rgb0;
 	u_char u0, v0;
+	u_short pad0;
 	SVECTOR xyz1;
 	CVECTOR rgb1;
 	u_char u1, v1;
+	u_short pad1;
 	SVECTOR xyz2;
 	CVECTOR rgb2;
 	u_char u2, v2;
+	u_short pad2;
 };
 
 struct Mesh

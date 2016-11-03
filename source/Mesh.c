@@ -125,7 +125,7 @@ void Mesh_Draw(Mesh* pSelf, int frameBufIdx, OrderingTable* pOrderTbl)
 			{
 				case MESHPT_TRI_GOUR:
 					pt.g3 = (POLY_G3*)pOutPrim;
-					tt.mtg = (MeshTriGour*)pInTri;					
+					tt.mtg = (MeshTriGour*)pInTri;				
 					clipVal = RotAverageNclip3(&tt.mtg->xyz0, &tt.mtg->xyz1, &tt.mtg->xyz2,
 						(long*)&pt.g3->x0, (long*)&pt.g3->x1, (long*)&pt.g3->x2,
 						&p, &otz, &flag);
@@ -136,9 +136,11 @@ void Mesh_Draw(Mesh* pSelf, int frameBufIdx, OrderingTable* pOrderTbl)
 					break;
 				case MESHPT_TRI_GOUR_TEX:
 					pt.gt3 = (POLY_GT3*)pOutPrim;
-					tt.mtgt = (MeshTriGourTex*)pInTri;					
+					tt.mtgt = (MeshTriGourTex*)pInTri;
+					//Debug_PrintSvector(&tt.mtgt->xyz0, "draw mtgt");
+					//Debug_PrintPolyGT3(pt.gt3, "draw mtgt");
 					clipVal = RotAverageNclip3(&tt.mtgt->xyz0, &tt.mtgt->xyz1, &tt.mtgt->xyz2,
-						(long*)&pt.g3->x0, (long*)&pt.g3->x1, (long*)&pt.g3->x2,
+						(long*)&pt.gt3->x0, (long*)&pt.gt3->x1, (long*)&pt.gt3->x2,
 						&p, &otz, &flag);
 					if (clipVal >= 0)
 					{
@@ -146,9 +148,9 @@ void Mesh_Draw(Mesh* pSelf, int frameBufIdx, OrderingTable* pOrderTbl)
 						pt.gt3->tpage = pAttr->tpageId;
 						OT_AddPrim(pOrderTbl, pOutPrim, otz);
 					}
-					pInTri = (u_long*)(tt.mtg + 1);
-					pOutPrim = (u_long*)(pt.g3 + 1);
-					pSelf->nUsedPrimWords[frameBufIdx] += sizeof(POLY_G3) / sizeof(u_long);
+					pInTri = (u_long*)(tt.mtgt + 1);
+					pOutPrim = (u_long*)(pt.gt3 + 1);
+					pSelf->nUsedPrimWords[frameBufIdx] += sizeof(POLY_GT3) / sizeof(u_long);
 					break;
 			} // End attr switch
 		} // End for every prim in attr
