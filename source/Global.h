@@ -14,6 +14,8 @@
 
 typedef struct OrderingTable OrderingTable;
 typedef struct FrameBuffer FrameBuffer;
+
+typedef struct GameObject GameObject;
 typedef struct Camera Camera;
 
 typedef struct Mesh Mesh;
