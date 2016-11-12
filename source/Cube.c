@@ -1,4 +1,7 @@
 #include "Cube.h"
+#include "GameObject.h"
+#include "GCRender.h"
+#include "Mesh.h"
 
 #define S 64
 #define RED { 255, 0, 0 }
@@ -80,6 +83,18 @@ MeshTriGour gCubeTris[] =
     },
 };
 int gnCubeTris = sizeof(gCubeTris) / sizeof(MeshTriGour);
+
+Mesh* Cube_AllocateMesh();
+
+void Cube_Construct(Cube* pSelf)
+{
+    GCRender* pGCRender = malloc(sizeof(GCRender));
+
+    GameObject_Construct(&pSelf->gameObj);
+    GCRender_Construct(pGCRender);
+    pGCRender->pMesh = Cube_AllocateMesh();
+    pSelf->gameObj.pGCRender = pGCRender;
+}
 
 Mesh* Cube_AllocateMesh()
 {

@@ -2,12 +2,11 @@
 #define _CAMERA_H_
 
 #include "Global.h"
-
-#include <libgte.h>
-#include <libgpu.h>
+#include "GameObject.h"
 
 struct Camera
 {
+    GameObject gameObj;
     short yaw;
     short pitch;
     short roll;

@@ -100,11 +100,6 @@ void Mesh_InitPrimBufs(Mesh* pSelf)
 	} // End for framebufs
 }
 
-void Mesh_PrepareDrawing(Mesh* pSelf, int frameBufIdx)
-{
-	pSelf->nUsedPrimWords[frameBufIdx] = 0;
-}
-
 void Mesh_Draw(Mesh* pSelf, int frameBufIdx, OrderingTable* pOrderTbl)
 {
 	int i, j;
@@ -132,7 +127,6 @@ void Mesh_Draw(Mesh* pSelf, int frameBufIdx, OrderingTable* pOrderTbl)
 					if (clipVal >= 0) OT_AddPrim(pOrderTbl, pOutPrim, otz);
 					pInTri = (u_long*)(tt.mtg + 1);
 					pOutPrim = (u_long*)(pt.g3 + 1);
-					pSelf->nUsedPrimWords[frameBufIdx] += sizeof(POLY_G3) / sizeof(u_long);
 					break;
 				case MESHPT_TRI_GOUR_TEX:
 					pt.gt3 = (POLY_GT3*)pOutPrim;
@@ -150,7 +144,6 @@ void Mesh_Draw(Mesh* pSelf, int frameBufIdx, OrderingTable* pOrderTbl)
 					}
 					pInTri = (u_long*)(tt.mtgt + 1);
 					pOutPrim = (u_long*)(pt.gt3 + 1);
-					pSelf->nUsedPrimWords[frameBufIdx] += sizeof(POLY_GT3) / sizeof(u_long);
 					break;
 			} // End attr switch
 		} // End for every prim in attr

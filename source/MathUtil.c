@@ -44,3 +44,12 @@ void M_MulMatrixTrans(MATRIX* pMtx1, MATRIX* pMtx2)
 	// Handle the translation part
 	ApplyMatrixLV(pMtx2, (VECTOR*)pMtx1->t, (VECTOR*)pMtx1->t);
 }
+
+void M_MulMatrixTransOut(MATRIX* pMtx1, MATRIX* pMtx2, MATRIX* pOut)
+{
+	// Multiplies just the rotation part of the matrix
+	MulMatrix0(pMtx1, pMtx2, pOut);
+
+	// Handle the translation part
+	ApplyMatrixLV(pMtx2, (VECTOR*)pMtx1->t, (VECTOR*)pOut->t);
+}

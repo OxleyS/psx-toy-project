@@ -3,9 +3,6 @@
 
 #include "Global.h"
 
-#include <libgte.h>
-#include <libgpu.h>
-
 void Debug_PrintHeaderToName(const char* pType, const char* pName);
 void Debug_PrintHeader(const char* pType, const char* pName);
 void Debug_PrintFooter();

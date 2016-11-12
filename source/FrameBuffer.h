@@ -4,9 +4,6 @@
 #include "Global.h"
 #include "OrderingTable.h"
 
-#include <libgte.h>
-#include <libgpu.h>
-
 struct FrameBuffer
 {
 	OrderingTable ot;

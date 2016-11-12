@@ -3,9 +3,6 @@
 
 #include "Global.h"
 
-#include <libgte.h>
-#include <libgpu.h>
-
 typedef enum MeshPrimType
 {
 	MESHPT_TRI_GOUR,
@@ -57,14 +54,12 @@ struct Mesh
 
 	// Re-used per frame
 	u_long* pPrims[2];
-	int nUsedPrimWords[2];
 	int maxPrimWords;
 };
 
 void Mesh_Construct(Mesh* pSelf);
 void Mesh_AllocateBuffers(Mesh* pSelf, int nModelTriWords, int nPrimWords, int nAttrs);
 void Mesh_InitPrimBufs(Mesh* pSelf);
-void Mesh_PrepareDrawing(Mesh* pSelf, int frameBufIdx);
 void Mesh_Draw(Mesh* pSelf, int frameBufIdx, OrderingTable* pOrderTbl);
 void Mesh_Destruct(Mesh* pSelf);
 

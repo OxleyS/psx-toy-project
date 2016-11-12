@@ -2,11 +2,16 @@
 #define _CUBE_H_
 
 #include "Global.h"
-#include "Mesh.h"
+#include "GameObject.h"
 
 extern MeshTriGour gCubeTris[];
 extern int gnCubeTris;
 
-Mesh* Cube_AllocateMesh();
+typedef struct Cube
+{
+    GameObject gameObj;
+} Cube;
+
+void Cube_Construct(Cube* pSelf);
 
 #endif

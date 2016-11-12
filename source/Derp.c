@@ -1,7 +1,5 @@
 #include "Global.h"
 
-#include <libgte.h>
-#include <libgpu.h>
 #include <libetc.h>
 
 #include "MathUtil.h"
@@ -12,6 +10,8 @@
 #include "Cube.h"
 #include "Checkerboard.h"
 #include "Camera.h"
+#include "GameObject.h"
+#include "GCRender.h"
 
 u_long __ramsize   = 0x00200000; // force 2 megabytes of RAM
 u_long __stacksize = 0x00004000; // force 16 kilobytes of stack
@@ -31,9 +31,10 @@ typedef enum VideoMode
 } VideoMode;
 static VideoMode gVideoMode;
 
-Mesh mesh;
+//Mesh mesh;
 Mesh checker;
 Camera camera;
+Cube cube;
 
 MeshTriGourTex plane[2] =
 {
@@ -128,7 +129,8 @@ void Initialize(void)
 	VSync(0);
 	SwapBuffers();
 
-	mesh = *Cube_AllocateMesh();
+	Cube_Construct(&cube);
+	cube.gameObj.pGCRender->worldMtx.t[2] = 500;
 }
 
 void Update(void)
@@ -155,10 +157,17 @@ void SetupDraw(void)
 
 void BuildDrawCommands(void)
 {
+	GameObject* pObj = (GameObject*)&cube;
+
 	MATRIX mtx;
 	MATRIX* pCameraMtx = Camera_GetMatrix(&camera);
 
-	Mesh_PrepareDrawing(&mesh, gCurFrameBufIdx);
+	GORenderData renderData;
+	renderData.pCamera = &camera;
+	renderData.frameBufIdx = gCurFrameBufIdx;
+	renderData.pFrameBuf = gpCurFrameBuf;
+
+	pObj->drawFunc(pObj, &renderData);
 
 	M_IdentityMatrix(&mtx);
 	mtx.t[2] = 500;
@@ -168,7 +177,6 @@ void BuildDrawCommands(void)
 	SetRotMatrix(&mtx);
 	SetTransMatrix(&mtx);
 	Mesh_Draw(&checker, gCurFrameBufIdx, &gpCurFrameBuf->ot);
-	Mesh_Draw(&mesh, gCurFrameBufIdx, &gpCurFrameBuf->ot);
 }
 
 void IssueDraw(void)

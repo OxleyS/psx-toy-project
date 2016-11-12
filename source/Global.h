@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
+#include <libgte.h>
+#include <libgpu.h>
+
 #define OT_LENGTH (256)
 
 #define SCREEN_WIDTH (320)
@@ -16,6 +19,9 @@ typedef struct OrderingTable OrderingTable;
 typedef struct FrameBuffer FrameBuffer;
 
 typedef struct GameObject GameObject;
+typedef struct GORenderData GORenderData;
+typedef struct GCRender GCRender;
+
 typedef struct Camera Camera;
 
 typedef struct Mesh Mesh;
