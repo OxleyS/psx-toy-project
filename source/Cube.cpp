@@ -88,7 +88,7 @@ Mesh* Cube_AllocateMesh();
 
 void Cube_Construct(Cube* pSelf)
 {
-    GCRender* pGCRender = malloc(sizeof(GCRender));
+    GCRender* pGCRender = (GCRender*)malloc(sizeof(GCRender));
 
     GameObject_Construct(&pSelf->gameObj);
     GCRender_Construct(pGCRender);
@@ -98,7 +98,7 @@ void Cube_Construct(Cube* pSelf)
 
 Mesh* Cube_AllocateMesh()
 {
-    Mesh* pMesh = malloc3(sizeof(Mesh));
+    Mesh* pMesh = (Mesh*)malloc3(sizeof(Mesh));
 
     Mesh_Construct(pMesh);
 	Mesh_AllocateBuffers(pMesh, (sizeof(MeshTriGour) * gnCubeTris) / sizeof(u_long),

@@ -80,7 +80,7 @@ void Input_Update()
         gInput.controlPadStates[i] = gInput.rawInputData.controlPortStates[i];
 
         // Seriously, Sony?
-        pByteSwap = (char*)&gInput.controlPadStates[i].state.sixteenInput.buttonState;
+        pByteSwap = (u_char*)&gInput.controlPadStates[i].state.sixteenInput.buttonState;
         byteSwap = pByteSwap[1];
         pByteSwap[1] = ~pByteSwap[0];
         pByteSwap[0] = ~byteSwap;

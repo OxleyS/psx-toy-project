@@ -1,6 +1,8 @@
 #include "Mesh.h"
 #include "OrderingTable.h"
 
+#include <memory.h>
+
 union InTriType
 {
 	MeshTriGour* mtg;
@@ -20,12 +22,12 @@ void Mesh_Construct(Mesh* pSelf)
 
 void Mesh_AllocateBuffers(Mesh* pSelf, int nModelTriWords, int nPrimWords, int nAttrs)
 {
-	pSelf->pModelTris = malloc3(sizeof(u_long) * nModelTriWords);
+	pSelf->pModelTris = (u_long*)malloc3(sizeof(u_long) * nModelTriWords);
 	pSelf->nModelTriWords = nModelTriWords;
-	pSelf->pAttrs = malloc3(sizeof(MeshAttr) * nAttrs);
+	pSelf->pAttrs = (MeshAttr*)malloc3(sizeof(MeshAttr) * nAttrs);
 	pSelf->nAttrs = nAttrs;
-	pSelf->pPrims[0] = malloc3(sizeof(u_long) * nPrimWords);
-	pSelf->pPrims[1] = malloc3(sizeof(u_long) * nPrimWords);
+	pSelf->pPrims[0] = (u_long*)malloc3(sizeof(u_long) * nPrimWords);
+	pSelf->pPrims[1] = (u_long*)malloc3(sizeof(u_long) * nPrimWords);
 	pSelf->maxPrimWords = nPrimWords;
 }
 

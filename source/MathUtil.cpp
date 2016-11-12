@@ -1,5 +1,7 @@
 #include "MathUtil.h"
 
+#include <memory.h>
+
 void M_ZeroVector(SVECTOR* pOutVec)
 {
 	memset(pOutVec, 0, sizeof(SVECTOR));

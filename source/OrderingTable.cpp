@@ -2,7 +2,7 @@
 
 void OT_Construct(OrderingTable* pSelf, int nEntries)
 {
-  pSelf->pEntries = nEntries ? malloc3(sizeof(u_long) * nEntries) : 0;
+  pSelf->pEntries = nEntries ? (u_long*)malloc3(sizeof(u_long) * nEntries) : NULL;
   pSelf->nEntries = 0;
   pSelf->bStatic = 0;
 }

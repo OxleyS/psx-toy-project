@@ -84,7 +84,7 @@ void Initialize(void)
 	u_short tpage;
 
 	// 1 MB of heap space
-	InitHeap3((void*)0x800F8000, 0x00100000);
+	InitHeap3((unsigned long*)0x800F8000, 0x00100000);
 
 	// This byte tells us whether we should use PAL (1) or NTSC (0)
 	if (*(char*)0xbfc7ff52 == 'E')
