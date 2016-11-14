@@ -11,8 +11,8 @@ class GCRender
 
     void DrawMesh(GORenderData* pRenderData);
 
-    Mesh* pMesh;
-    MATRIX worldMtx;
+    Mesh* m_pMesh;
+    MATRIX m_WorldMtx;
 };
 
 #endif

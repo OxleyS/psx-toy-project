@@ -2,28 +2,28 @@
 
 OrderingTable::OrderingTable(int nEntries)
 {
-  pEntries = nEntries ? (u_long*)malloc3(sizeof(u_long) * nEntries) : NULL;
-  nEntries = 0;
-  bStatic = 0;
+  m_pEntries = nEntries ? (u_long*)malloc3(sizeof(u_long) * nEntries) : NULL;
+  m_nEntries = nEntries;
+  m_bStatic = 0;
 }
 
 OrderingTable::~OrderingTable()
 {
-  if (!bStatic) free(pEntries);
+  if (!m_bStatic) free(m_pEntries);
 }
 
 void OrderingTable::Clear()
 {
-  ClearOTagR(pEntries, nEntries);
+  ClearOTagR(m_pEntries, m_nEntries);
 }
 
 void OrderingTable::IssueToGpu()
 {
-  DrawOTag(pEntries + (nEntries - 1));
+  DrawOTag(m_pEntries + (m_nEntries - 1));
 }
 
 void OrderingTable::AddOt(OrderingTable* pToAdd, int pos)
 {
-  if (pos > 0 && pos < nEntries)
-    AddPrims(pEntries + pos, pToAdd + (pToAdd->nEntries - 1), pToAdd);
+  if (pos > 0 && pos < m_nEntries)
+    AddPrims(m_pEntries + pos, pToAdd + (pToAdd->m_nEntries - 1), pToAdd);
 }

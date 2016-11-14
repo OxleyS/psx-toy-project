@@ -1,13 +1,13 @@
-#include "MathUtil.h"
+#include "Math.h"
 
 #include <memory.h>
 
-void M_ZeroVector(SVECTOR* pOutVec)
+void Math::ZeroVector(SVECTOR* pOutVec)
 {
 	memset(pOutVec, 0, sizeof(SVECTOR));
 }
 
-int M_DotProduct(const SVECTOR* pVec1, const SVECTOR* pVec2)
+int Math::DotProduct(const SVECTOR* pVec1, const SVECTOR* pVec2)
 {
 	int result = pVec1->vx * pVec2->vx;
 	result += pVec1->vy * pVec2->vy;
@@ -15,7 +15,7 @@ int M_DotProduct(const SVECTOR* pVec1, const SVECTOR* pVec2)
 	return result;
 }
 
-void M_IdentityMatrix(MATRIX* pOutMtx)
+void Math::IdentityMatrix(MATRIX* pOutMtx)
 {
 	memset(pOutMtx, 0, sizeof(MATRIX));
 	pOutMtx->m[0][0] = 0x1000;
@@ -23,7 +23,7 @@ void M_IdentityMatrix(MATRIX* pOutMtx)
 	pOutMtx->m[2][2] = 0x1000;
 }
 
-void M_IdentityMatrixRot(MATRIX* pOutMtx)
+void Math::IdentityMatrixRot(MATRIX* pOutMtx)
 {
 	memset(pOutMtx->m, 0, sizeof(pOutMtx->m));
 	pOutMtx->m[0][0] = 0x1000;
@@ -31,14 +31,14 @@ void M_IdentityMatrixRot(MATRIX* pOutMtx)
 	pOutMtx->m[2][2] = 0x1000;
 }
 
-void M_ZeroMatrixTrans(MATRIX* pOutMtx)
+void Math::ZeroMatrixTrans(MATRIX* pOutMtx)
 {
 	pOutMtx->t[0] = 0;
 	pOutMtx->t[1] = 0; 
 	pOutMtx->t[2] = 0;
 }
 
-void M_MulMatrixTrans(MATRIX* pMtx1, MATRIX* pMtx2)
+void Math::MulMatrixTrans(MATRIX* pMtx1, MATRIX* pMtx2)
 {
 	// Multiplies just the rotation part of the matrix
 	MulMatrix(pMtx1, pMtx2);
@@ -47,7 +47,7 @@ void M_MulMatrixTrans(MATRIX* pMtx1, MATRIX* pMtx2)
 	ApplyMatrixLV(pMtx2, (VECTOR*)pMtx1->t, (VECTOR*)pMtx1->t);
 }
 
-void M_MulMatrixTransOut(MATRIX* pMtx1, MATRIX* pMtx2, MATRIX* pOut)
+void Math::MulMatrixTransOut(MATRIX* pMtx1, MATRIX* pMtx2, MATRIX* pOut)
 {
 	// Multiplies just the rotation part of the matrix
 	MulMatrix0(pMtx1, pMtx2, pOut);

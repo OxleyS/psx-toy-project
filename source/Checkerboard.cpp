@@ -1,8 +1,8 @@
 #include "Checkerboard.h"
 
-int gCheckerboardWidth = 64;
-int gCheckerboardHeight = 64;
-u_long gCheckerboardRgb[2048];
+int g_CheckerboardWidth = 64;
+int g_CheckerboardHeight = 64;
+u_long g_CheckerboardRgb[2048];
 
 void Checkerboard_Initialize()
 {
@@ -11,12 +11,12 @@ void Checkerboard_Initialize()
     int colorIdx;
 
     int i, j, startIdx = 0, horIdx = 0, verIdx = 0;
-    for (i = 0; i < gCheckerboardHeight; i++)
+    for (i = 0; i < g_CheckerboardHeight; i++)
     {
         colorIdx = startIdx;
-        for (j = 0; j < gCheckerboardWidth / 2; j++)
+        for (j = 0; j < g_CheckerboardWidth / 2; j++)
         {
-            gCheckerboardRgb[horIdx] = colors[colorIdx]; 
+            g_CheckerboardRgb[horIdx] = colors[colorIdx]; 
             horIdx++;
             if (horIdx % 4 == 0) colorIdx = (colorIdx + 1) % nColors;
         }

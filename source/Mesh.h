@@ -56,14 +56,14 @@ class Mesh
 	void Draw(int frameBufIdx, OrderingTable* pOrderTbl);	
 
 	// Static at load time
-	u_long* pModelTris;
-	int nModelTriWords;
-	MeshAttr* pAttrs;
-	int nAttrs;
+	u_long* m_pModelTris;
+	int m_nModelTriWords;
+	MeshAttr* m_pAttrs;
+	int m_nAttrs;
 
 	// Re-used per frame
-	u_long* pPrims[2];
-	int maxPrimWords;
+	u_long* m_pPrims[2];
+	int m_MaxPrimWords;
 };
 
 #endif

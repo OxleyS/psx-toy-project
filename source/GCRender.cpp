@@ -1,25 +1,26 @@
 #include "GCRender.h"
-#include "MathUtil.h"
+#include "Math.h"
 #include "Camera.h"
 #include "Mesh.h"
 #include "FrameBuffer.h"
 #include "GameObject.h"
+#include "Debug.h"
 
 GCRender::GCRender()
 {
-    pMesh = NULL;
-    M_IdentityMatrix(&worldMtx);
+    m_pMesh = NULL;
+    Math::IdentityMatrix(&m_WorldMtx);
 }
 
 void GCRender::DrawMesh(GORenderData* pRenderData)
 {
     MATRIX mtx;
 
-    if (!pMesh) return;
+    if (!m_pMesh) return;
     
-    M_MulMatrixTransOut(&worldMtx, pRenderData->pCamera->GetCameraMatrix(), &mtx);
+    Math::MulMatrixTransOut(&m_WorldMtx, pRenderData->pCamera->GetCameraMatrix(), &mtx);
 	SetRotMatrix(&mtx);
 	SetTransMatrix(&mtx);
 
-	pMesh->Draw(pRenderData->frameBufIdx, &pRenderData->pFrameBuf->ot);
+	m_pMesh->Draw(pRenderData->frameBufIdx, &pRenderData->pFrameBuf->m_Ot);
 }

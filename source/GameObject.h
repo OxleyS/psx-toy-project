@@ -19,7 +19,7 @@ class GameObject
     virtual void Update();
     virtual void Draw(GORenderData* pRenderData);
 
-    GCRender* pGCRender;
+    GCRender* m_pGCRender;
 };
 
 #endif

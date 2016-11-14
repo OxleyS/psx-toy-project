@@ -1,4 +1,4 @@
-#include "DebugUtil.h"
+#include "Debug.h"
 #include "OrderingTable.h"
 
 #include <stdio.h>
@@ -83,7 +83,7 @@ void Debug::PrintSvector(const SVECTOR* pVec, const char* pName)
 void Debug::PrintOt(const OrderingTable* pOt, const char* pName)
 {
 	Debug::PrintHeader("OT", pName);
-	DumpOTag(pOt->pEntries + (pOt->nEntries - 1));
+	DumpOTag(pOt->m_pEntries + (pOt->m_nEntries - 1));
 	Debug::PrintFooter();
 }
 

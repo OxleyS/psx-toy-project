@@ -3,7 +3,7 @@
 
 GameObject::GameObject()
 {
-    pGCRender = NULL;
+    m_pGCRender = NULL;
 }
 
 void GameObject::Update()
@@ -12,5 +12,5 @@ void GameObject::Update()
 
 void GameObject::Draw(GORenderData* pRenderData)
 {
-    if (pGCRender) pGCRender->DrawMesh(pRenderData);
+    if (m_pGCRender) m_pGCRender->DrawMesh(pRenderData);
 }

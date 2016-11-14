@@ -12,12 +12,12 @@ class OrderingTable
 
   void Clear();
   void IssueToGpu();
-  FORCE_INLINE void AddPrim(void* pPrim, int pos) { if (pos > 0 && pos < nEntries) ::AddPrim(pEntries + pos, pPrim); }
+  FORCE_INLINE void AddPrim(void* pPrim, int pos) { if (pos > 0 && pos < m_nEntries) ::AddPrim(m_pEntries + pos, pPrim); }
   void AddOt(OrderingTable* pToAdd, int pos);
 
-  u_long* pEntries;
-  int nEntries;
-  bool bStatic;
+  u_long* m_pEntries;
+  int m_nEntries;
+  bool m_bStatic;
 };
 
 #endif

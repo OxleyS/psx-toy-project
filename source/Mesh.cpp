@@ -22,21 +22,21 @@ Mesh::Mesh()
 
 Mesh::~Mesh()
 {
-	if (pModelTris) free(pModelTris);
-	if (pAttrs) free(pAttrs);
-	if (pPrims[0]) free(pPrims[0]);
-	if (pPrims[1]) free(pPrims[1]);
+	if (m_pModelTris) free(m_pModelTris);
+	if (m_pAttrs) free(m_pAttrs);
+	if (m_pPrims[0]) free(m_pPrims[0]);
+	if (m_pPrims[1]) free(m_pPrims[1]);
 }
 
 void Mesh::AllocateBuffers(int nModelTriWords, int nPrimWords, int nAttrs)
 {
-	pModelTris = (u_long*)malloc3(sizeof(u_long) * nModelTriWords);
-	nModelTriWords = nModelTriWords;
-	pAttrs = (MeshAttr*)malloc3(sizeof(MeshAttr) * nAttrs);
-	nAttrs = nAttrs;
-	pPrims[0] = (u_long*)malloc3(sizeof(u_long) * nPrimWords);
-	pPrims[1] = (u_long*)malloc3(sizeof(u_long) * nPrimWords);
-	maxPrimWords = nPrimWords;
+	m_pModelTris = (u_long*)malloc3(sizeof(u_long) * nModelTriWords);
+	m_nModelTriWords = nModelTriWords;
+	m_pAttrs = (MeshAttr*)malloc3(sizeof(MeshAttr) * nAttrs);
+	m_nAttrs = nAttrs;
+	m_pPrims[0] = (u_long*)malloc3(sizeof(u_long) * nPrimWords);
+	m_pPrims[1] = (u_long*)malloc3(sizeof(u_long) * nPrimWords);
+	m_MaxPrimWords = nPrimWords;
 }
 
 void Mesh::InitPrimBufs()
@@ -52,12 +52,12 @@ void Mesh::InitPrimBufs()
 
 	for (frameBufIdx = 0; frameBufIdx < 2; frameBufIdx++)
 	{
-		pOutPrim = pPrims[frameBufIdx];
-		pInTri = pModelTris;
+		pOutPrim = m_pPrims[frameBufIdx];
+		pInTri = m_pModelTris;
 		
-		for (i = 0; i < nAttrs; i++)
+		for (i = 0; i < m_nAttrs; i++)
 		{
-			pAttr = &pAttrs[i];
+			pAttr = &m_pAttrs[i];
 			for (j = 0; j < pAttr->nPrims; j++)
 			{
 				switch (pAttr->attrCode)
@@ -114,16 +114,16 @@ void Mesh::Draw(int frameBufIdx, OrderingTable* pOrderTbl)
 {
 	int i, j;
 	MeshAttr* pAttr;
-	u_long* pInTri = pModelTris;
-	u_long* pOutPrim = pPrims[frameBufIdx];
+	u_long* pInTri = m_pModelTris;
+	u_long* pOutPrim = m_pPrims[frameBufIdx];
 	long otz, p, flag, clipVal;
 
 	union InTriType tt;
 	union OutPolyType pt;
 
-	for (i = 0; i < nAttrs; i++)
+	for (i = 0; i < m_nAttrs; i++)
 	{
-		pAttr = &pAttrs[i];
+		pAttr = &m_pAttrs[i];
 		for (j = 0; j < pAttr->nPrims; j++)
 		{
 			switch (pAttr->attrCode)

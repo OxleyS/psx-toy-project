@@ -13,12 +13,12 @@ struct Camera : GameObject
     void ClampRotations();
     MATRIX* GetCameraMatrix();
 
-    short yaw;
-    short pitch;
-    short roll;
-    MATRIX cameraMtx;
-    SVECTOR position;
-    u_char bDirty;
+    short m_Yaw;
+    short m_Pitch;
+    short m_Roll;
+    MATRIX m_CameraMtx;
+    SVECTOR m_Position;
+    u_char m_bDirty;
 };
 
 #endif

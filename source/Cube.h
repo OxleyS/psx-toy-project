@@ -4,8 +4,8 @@
 #include "Global.h"
 #include "GameObject.h"
 
-extern MeshTriGour gCubeTris[];
-extern int gnCubeTris;
+extern MeshTriGour g_CubeTris[];
+extern int g_nCubeTris;
 
 class Cube : public GameObject
 {

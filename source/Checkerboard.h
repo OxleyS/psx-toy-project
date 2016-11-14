@@ -3,9 +3,9 @@
 
 #include "Global.h"
 
-extern u_long gCheckerboardRgb[];
-extern int gCheckerboardWidth; // Texels
-extern int gCheckerboardHeight; // Texels
+extern u_long g_CheckerboardRgb[];
+extern int g_CheckerboardWidth; // Texels
+extern int g_CheckerboardHeight; // Texels
 
 void Checkerboard_Initialize();
 
