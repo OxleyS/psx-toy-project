@@ -3,13 +3,16 @@
 
 #include "Global.h"
 
-struct GCRender
+class GCRender
 {
+    public:
+
+    GCRender();
+
+    void DrawMesh(GORenderData* pRenderData);
+
     Mesh* pMesh;
     MATRIX worldMtx;
 };
-
-void GCRender_Construct(GCRender* pSelf);
-void GCRender_DrawMesh(GCRender* pSelf, GORenderData* pRenderData);
 
 #endif

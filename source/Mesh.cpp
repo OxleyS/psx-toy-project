@@ -15,23 +15,31 @@ union OutPolyType
 	POLY_GT3* gt3;
 };
 
-void Mesh_Construct(Mesh* pSelf)
+Mesh::Mesh()
 {
-	memset(pSelf, 0, sizeof(Mesh));
+	memset(this, 0, sizeof(Mesh));
 }
 
-void Mesh_AllocateBuffers(Mesh* pSelf, int nModelTriWords, int nPrimWords, int nAttrs)
+Mesh::~Mesh()
 {
-	pSelf->pModelTris = (u_long*)malloc3(sizeof(u_long) * nModelTriWords);
-	pSelf->nModelTriWords = nModelTriWords;
-	pSelf->pAttrs = (MeshAttr*)malloc3(sizeof(MeshAttr) * nAttrs);
-	pSelf->nAttrs = nAttrs;
-	pSelf->pPrims[0] = (u_long*)malloc3(sizeof(u_long) * nPrimWords);
-	pSelf->pPrims[1] = (u_long*)malloc3(sizeof(u_long) * nPrimWords);
-	pSelf->maxPrimWords = nPrimWords;
+	if (pModelTris) free(pModelTris);
+	if (pAttrs) free(pAttrs);
+	if (pPrims[0]) free(pPrims[0]);
+	if (pPrims[1]) free(pPrims[1]);
 }
 
-void Mesh_InitPrimBufs(Mesh* pSelf)
+void Mesh::AllocateBuffers(int nModelTriWords, int nPrimWords, int nAttrs)
+{
+	pModelTris = (u_long*)malloc3(sizeof(u_long) * nModelTriWords);
+	nModelTriWords = nModelTriWords;
+	pAttrs = (MeshAttr*)malloc3(sizeof(MeshAttr) * nAttrs);
+	nAttrs = nAttrs;
+	pPrims[0] = (u_long*)malloc3(sizeof(u_long) * nPrimWords);
+	pPrims[1] = (u_long*)malloc3(sizeof(u_long) * nPrimWords);
+	maxPrimWords = nPrimWords;
+}
+
+void Mesh::InitPrimBufs()
 {
 	int i, j;
 	MeshAttr* pAttr;
@@ -44,12 +52,12 @@ void Mesh_InitPrimBufs(Mesh* pSelf)
 
 	for (frameBufIdx = 0; frameBufIdx < 2; frameBufIdx++)
 	{
-		pOutPrim = pSelf->pPrims[frameBufIdx];
-		pInTri = pSelf->pModelTris;
+		pOutPrim = pPrims[frameBufIdx];
+		pInTri = pModelTris;
 		
-		for (i = 0; i < pSelf->nAttrs; i++)
+		for (i = 0; i < nAttrs; i++)
 		{
-			pAttr = &pSelf->pAttrs[i];
+			pAttr = &pAttrs[i];
 			for (j = 0; j < pAttr->nPrims; j++)
 			{
 				switch (pAttr->attrCode)
@@ -102,20 +110,20 @@ void Mesh_InitPrimBufs(Mesh* pSelf)
 	} // End for framebufs
 }
 
-void Mesh_Draw(Mesh* pSelf, int frameBufIdx, OrderingTable* pOrderTbl)
+void Mesh::Draw(int frameBufIdx, OrderingTable* pOrderTbl)
 {
 	int i, j;
 	MeshAttr* pAttr;
-	u_long* pInTri = pSelf->pModelTris;
-	u_long* pOutPrim = pSelf->pPrims[frameBufIdx];
+	u_long* pInTri = pModelTris;
+	u_long* pOutPrim = pPrims[frameBufIdx];
 	long otz, p, flag, clipVal;
 
 	union InTriType tt;
 	union OutPolyType pt;
 
-	for (i = 0; i < pSelf->nAttrs; i++)
+	for (i = 0; i < nAttrs; i++)
 	{
-		pAttr = &pSelf->pAttrs[i];
+		pAttr = &pAttrs[i];
 		for (j = 0; j < pAttr->nPrims; j++)
 		{
 			switch (pAttr->attrCode)
@@ -126,15 +134,13 @@ void Mesh_Draw(Mesh* pSelf, int frameBufIdx, OrderingTable* pOrderTbl)
 					clipVal = RotAverageNclip3(&tt.mtg->xyz0, &tt.mtg->xyz1, &tt.mtg->xyz2,
 						(long*)&pt.g3->x0, (long*)&pt.g3->x1, (long*)&pt.g3->x2,
 						&p, &otz, &flag);
-					if (clipVal >= 0) OT_AddPrim(pOrderTbl, pOutPrim, otz);
+					if (clipVal >= 0) pOrderTbl->AddPrim(pOutPrim, otz);
 					pInTri = (u_long*)(tt.mtg + 1);
 					pOutPrim = (u_long*)(pt.g3 + 1);
 					break;
 				case MESHPT_TRI_GOUR_TEX:
 					pt.gt3 = (POLY_GT3*)pOutPrim;
 					tt.mtgt = (MeshTriGourTex*)pInTri;
-					//Debug_PrintSvector(&tt.mtgt->xyz0, "draw mtgt");
-					//Debug_PrintPolyGT3(pt.gt3, "draw mtgt");
 					clipVal = RotAverageNclip3(&tt.mtgt->xyz0, &tt.mtgt->xyz1, &tt.mtgt->xyz2,
 						(long*)&pt.gt3->x0, (long*)&pt.gt3->x1, (long*)&pt.gt3->x2,
 						&p, &otz, &flag);
@@ -142,7 +148,7 @@ void Mesh_Draw(Mesh* pSelf, int frameBufIdx, OrderingTable* pOrderTbl)
 					{
 						pt.gt3->clut = pAttr->clutId;
 						pt.gt3->tpage = pAttr->tpageId;
-						OT_AddPrim(pOrderTbl, pOutPrim, otz);
+						pOrderTbl->AddPrim(pOutPrim, otz);
 					}
 					pInTri = (u_long*)(tt.mtgt + 1);
 					pOutPrim = (u_long*)(pt.gt3 + 1);
@@ -150,12 +156,4 @@ void Mesh_Draw(Mesh* pSelf, int frameBufIdx, OrderingTable* pOrderTbl)
 			} // End attr switch
 		} // End for every prim in attr
 	} // End for every attr
-}
-
-void Mesh_Destruct(Mesh* pSelf)
-{
-	if (pSelf->pModelTris) free(pSelf->pModelTris);
-	if (pSelf->pAttrs) free(pSelf->pAttrs);
-	if (pSelf->pPrims[0]) free(pSelf->pPrims[0]);
-	if (pSelf->pPrims[1]) free(pSelf->pPrims[1]);
 }

@@ -4,9 +4,15 @@
 #include "Global.h"
 #include "GameObject.h"
 
-struct Camera
+struct Camera : GameObject
 {
-    GameObject gameObj;
+    public:
+
+    Camera();
+
+    void ClampRotations();
+    MATRIX* GetCameraMatrix();
+
     short yaw;
     short pitch;
     short roll;
@@ -14,9 +20,5 @@ struct Camera
     SVECTOR position;
     u_char bDirty;
 };
-
-void Camera_Construct(Camera* pSelf);
-void Camera_ClampRotations(Camera* pSelf);
-MATRIX* Camera_GetMatrix(Camera* pSelf);
 
 #endif

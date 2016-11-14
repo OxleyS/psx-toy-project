@@ -1,14 +1,15 @@
 #include "FrameBuffer.h"
 
-void FrameBuffer_Construct(FrameBuffer* pSelf, int xOffset, int yOffset)
+FrameBuffer::FrameBuffer() : ot(0)
 {
-	DISPENV* pDispEnv;
 
-	OT_Construct(&pSelf->ot, 0);
+}
 
-	SetDefDrawEnv(&pSelf->drawEnv, xOffset, yOffset, SCREEN_WIDTH, SCREEN_HEIGHT);
+void FrameBuffer::Initialize(int xOffset, int yOffset)
+{
+	SetDefDrawEnv(&drawEnv, xOffset, yOffset, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	pDispEnv = &pSelf->dispEnv;
+	DISPENV* pDispEnv = &dispEnv;
 	SetDefDispEnv(pDispEnv, xOffset, yOffset, SCREEN_WIDTH, SCREEN_HEIGHT);
 	pDispEnv->screen.w = SCREEN_WIDTH;
 	pDispEnv->screen.h = SCREEN_HEIGHT;

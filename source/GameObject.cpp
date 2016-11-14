@@ -1,18 +1,16 @@
 #include "GameObject.h"
 #include "GCRender.h"
 
-void GameObject_Construct(GameObject* pSelf)
+GameObject::GameObject()
 {
-    pSelf->updateFunc = GameObject_DefaultUpdate;
-    pSelf->drawFunc = GameObject_DefaultDraw;
-    pSelf->pGCRender = NULL;
+    pGCRender = NULL;
 }
 
-void GameObject_DefaultUpdate(GameObject* pSelf)
+void GameObject::Update()
 {
 }
 
-void GameObject_DefaultDraw(GameObject* pSelf, GORenderData* pRenderData)
+void GameObject::Draw(GORenderData* pRenderData)
 {
-    if (pSelf->pGCRender) GCRender_DrawMesh(pSelf->pGCRender, pRenderData);
+    if (pGCRender) pGCRender->DrawMesh(pRenderData);
 }

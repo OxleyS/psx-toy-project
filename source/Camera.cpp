@@ -1,39 +1,39 @@
 #include "Camera.h"
 #include "MathUtil.h"
 
-void Camera_Construct(Camera* pSelf)
+Camera::Camera()
 {
-    pSelf->yaw = 0;
-    pSelf->pitch = 0;
-    pSelf->roll = 0;
-    M_IdentityMatrix(&pSelf->cameraMtx);
-    M_ZeroVector(&pSelf->position);
-    pSelf->bDirty = 0;
+    yaw = 0;
+    pitch = 0;
+    roll = 0;
+    M_IdentityMatrix(&cameraMtx);
+    M_ZeroVector(&position);
+    bDirty = 0;
 }
 
-void Camera_ClampRotations(Camera* pSelf)
+void Camera::ClampRotations()
 {
-    if (pSelf->yaw < 0) pSelf->yaw += 4096;
-    if (pSelf->yaw > 4096) pSelf->yaw -= 4096;
-    if (pSelf->pitch < 0) pSelf->pitch += 4096;
-    if (pSelf->pitch > 4096) pSelf->pitch -= 4096;
-    if (pSelf->roll < 0) pSelf->roll += 4096;
-    if (pSelf->roll > 4096) pSelf->roll -= 4096;
-    pSelf->bDirty = 1;
+    if (yaw < 0) yaw += 4096;
+    if (yaw > 4096) yaw -= 4096;
+    if (pitch < 0) pitch += 4096;
+    if (pitch > 4096) pitch -= 4096;
+    if (roll < 0) roll += 4096;
+    if (roll > 4096) roll -= 4096;
+    bDirty = 1;
 }
 
-MATRIX* Camera_GetMatrix(Camera* pSelf) 
+MATRIX* Camera::GetCameraMatrix() 
 {
-    if (pSelf->bDirty)
+    if (bDirty)
     {
-        SVECTOR rotAmt = { pSelf->pitch, pSelf->yaw, pSelf->roll, 0 };
-        RotMatrixYXZ_gte(&rotAmt, &pSelf->cameraMtx);
-        TransposeMatrix(&pSelf->cameraMtx, &pSelf->cameraMtx);
-        pSelf->cameraMtx.t[0] = -(M_DotProduct((SVECTOR*)pSelf->cameraMtx.m[0], &pSelf->position) >> 12);
-        pSelf->cameraMtx.t[1] = -(M_DotProduct((SVECTOR*)pSelf->cameraMtx.m[1], &pSelf->position) >> 12);
-        pSelf->cameraMtx.t[2] = -(M_DotProduct((SVECTOR*)pSelf->cameraMtx.m[2], &pSelf->position) >> 12);
-        pSelf->bDirty = 0;
+        SVECTOR rotAmt = { pitch, yaw, roll, 0 };
+        RotMatrixYXZ_gte(&rotAmt, &cameraMtx);
+        TransposeMatrix(&cameraMtx, &cameraMtx);
+        cameraMtx.t[0] = -(M_DotProduct((SVECTOR*)cameraMtx.m[0], &position) >> 12);
+        cameraMtx.t[1] = -(M_DotProduct((SVECTOR*)cameraMtx.m[1], &position) >> 12);
+        cameraMtx.t[2] = -(M_DotProduct((SVECTOR*)cameraMtx.m[2], &position) >> 12);
+        bDirty = 0;
     }
 
-    return &pSelf->cameraMtx;
+    return &cameraMtx;
 }

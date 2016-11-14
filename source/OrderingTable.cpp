@@ -1,41 +1,29 @@
 #include "OrderingTable.h"
 
-void OT_Construct(OrderingTable* pSelf, int nEntries)
+OrderingTable::OrderingTable(int nEntries)
 {
-  pSelf->pEntries = nEntries ? (u_long*)malloc3(sizeof(u_long) * nEntries) : NULL;
-  pSelf->nEntries = 0;
-  pSelf->bStatic = 0;
+  pEntries = nEntries ? (u_long*)malloc3(sizeof(u_long) * nEntries) : NULL;
+  nEntries = 0;
+  bStatic = 0;
 }
 
-void OT_ConstructStatic(OrderingTable* pSelf, u_long* pMem, int nEntries)
+OrderingTable::~OrderingTable()
 {
-  pSelf->pEntries = pMem;
-  pSelf->nEntries = nEntries;
-  pSelf->bStatic = 1;
+  if (!bStatic) free(pEntries);
 }
 
-void OT_Clear(OrderingTable* pSelf)
+void OrderingTable::Clear()
 {
-  ClearOTagR(pSelf->pEntries, pSelf->nEntries);
+  ClearOTagR(pEntries, nEntries);
 }
 
-void OT_IssueToGpu(OrderingTable* pSelf)
+void OrderingTable::IssueToGpu()
 {
-  DrawOTag(pSelf->pEntries + (pSelf->nEntries - 1));
+  DrawOTag(pEntries + (nEntries - 1));
 }
 
-void OT_AddPrim(OrderingTable* pSelf, void* pPrim, int pos)
+void OrderingTable::AddOt(OrderingTable* pToAdd, int pos)
 {
-  if (pos > 0 && pos < pSelf->nEntries) AddPrim(pSelf->pEntries + pos, pPrim);
-}
-
-void OT_AddOt(OrderingTable* pSelf, OrderingTable* pToAdd, int pos)
-{
-  if (pos > 0 && pos < pSelf->nEntries)
-    AddPrims(pSelf->pEntries + pos, pToAdd + (pToAdd->nEntries - 1), pToAdd);
-}
-
-void OT_Destruct(OrderingTable* pSelf)
-{
-  if (pSelf->bStatic) free(pSelf->pEntries);
+  if (pos > 0 && pos < nEntries)
+    AddPrims(pEntries + pos, pToAdd + (pToAdd->nEntries - 1), pToAdd);
 }

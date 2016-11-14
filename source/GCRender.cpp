@@ -5,21 +5,21 @@
 #include "FrameBuffer.h"
 #include "GameObject.h"
 
-void GCRender_Construct(GCRender* pSelf)
+GCRender::GCRender()
 {
-    pSelf->pMesh = NULL;
-    M_IdentityMatrix(&pSelf->worldMtx);
+    pMesh = NULL;
+    M_IdentityMatrix(&worldMtx);
 }
 
-void GCRender_DrawMesh(GCRender* pSelf, GORenderData* pRenderData)
+void GCRender::DrawMesh(GORenderData* pRenderData)
 {
     MATRIX mtx;
 
-    if (!pSelf->pMesh) return;
+    if (!pMesh) return;
     
-    M_MulMatrixTransOut(&pSelf->worldMtx, Camera_GetMatrix(pRenderData->pCamera), &mtx);
+    M_MulMatrixTransOut(&worldMtx, pRenderData->pCamera->GetCameraMatrix(), &mtx);
 	SetRotMatrix(&mtx);
 	SetTransMatrix(&mtx);
 
-	Mesh_Draw(pSelf->pMesh, pRenderData->frameBufIdx, &pRenderData->pFrameBuf->ot);
+	pMesh->Draw(pRenderData->frameBufIdx, &pRenderData->pFrameBuf->ot);
 }

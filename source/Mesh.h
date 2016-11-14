@@ -44,8 +44,17 @@ struct MeshTriGourTex
 	u_short pad2;
 };
 
-struct Mesh
+class Mesh
 {
+	public:
+
+	Mesh();
+	~Mesh();
+
+	void InitPrimBufs();
+	void AllocateBuffers(int nModelTriWords, int nPrimWords, int nAttrs);
+	void Draw(int frameBufIdx, OrderingTable* pOrderTbl);	
+
 	// Static at load time
 	u_long* pModelTris;
 	int nModelTriWords;
@@ -56,11 +65,5 @@ struct Mesh
 	u_long* pPrims[2];
 	int maxPrimWords;
 };
-
-void Mesh_Construct(Mesh* pSelf);
-void Mesh_AllocateBuffers(Mesh* pSelf, int nModelTriWords, int nPrimWords, int nAttrs);
-void Mesh_InitPrimBufs(Mesh* pSelf);
-void Mesh_Draw(Mesh* pSelf, int frameBufIdx, OrderingTable* pOrderTbl);
-void Mesh_Destruct(Mesh* pSelf);
 
 #endif

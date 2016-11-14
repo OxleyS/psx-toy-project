@@ -7,6 +7,8 @@
 #include <libgte.h>
 #include <libgpu.h>
 
+#define FORCE_INLINE __attribute__((always_inline))
+
 #define OT_LENGTH (256)
 
 #define SCREEN_WIDTH (320)

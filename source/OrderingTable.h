@@ -3,19 +3,21 @@
 
 #include "Global.h"
 
-struct OrderingTable
+class OrderingTable
 {
+  public:  
+
+  OrderingTable(int nEntries);
+  ~OrderingTable();
+
+  void Clear();
+  void IssueToGpu();
+  FORCE_INLINE void AddPrim(void* pPrim, int pos) { if (pos > 0 && pos < nEntries) ::AddPrim(pEntries + pos, pPrim); }
+  void AddOt(OrderingTable* pToAdd, int pos);
+
   u_long* pEntries;
   int nEntries;
-  int bStatic;
+  bool bStatic;
 };
-
-void OT_Construct(OrderingTable* pSelf, int nEntries);
-void OT_ConstructStatic(OrderingTable* pSelf, u_long* pMem, int nEntries);
-void OT_Clear(OrderingTable* pSelf);
-void OT_IssueToGpu(OrderingTable* pSelf);
-void OT_AddPrim(OrderingTable* pSelf, void* pPrim, int pos);
-void OT_AddOt(OrderingTable* pSelf, OrderingTable* pToAdd, int pos);
-void OT_Destruct(OrderingTable* pSelf);
 
 #endif

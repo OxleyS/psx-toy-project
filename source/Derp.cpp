@@ -1,6 +1,7 @@
 #include "Global.h"
 
 #include <libetc.h>
+#include <stdio.h>
 
 #include "MathUtil.h"
 #include "DebugUtil.h"
@@ -22,19 +23,17 @@ FrameBuffer gFrameBuffers[2];
 FrameBuffer* gpCurFrameBuf = gFrameBuffers;
 u_char gCurFrameBufIdx = 0;
 
-static u_long gFrameBufOtEntries1[OT_LENGTH];
-static u_long gFrameBufOtEntries2[OT_LENGTH];
+static u_long gFrameBufOtEntries[2][OT_LENGTH];
 
-typedef enum VideoMode
+enum VideoMode
 {
 	VIDEOMODE_NTSC, VIDEOMODE_PAL
-} VideoMode;
+};
 static VideoMode gVideoMode;
 
-//Mesh mesh;
-Mesh checker;
-Camera camera;
-Cube cube;
+Mesh* pChecker;
+Camera* pCamera;
+Cube* pCube;
 
 MeshTriGourTex plane[2] =
 {
@@ -99,75 +98,74 @@ void Initialize(void)
 	}
 	
 	ResetGraph(0);
-	Input_Initialize(0);
+	Input::Initialize(0);
 	InitGeom();
 	SetGeomScreen(400);
 	SetGeomOffset(SCREEN_CENTER_X, SCREEN_CENTER_Y);
 	SetDispMask(1);
 
-	FrameBuffer_Construct(gFrameBuffers, 0, 0);
-	OT_ConstructStatic(&gFrameBuffers[0].ot, gFrameBufOtEntries1, OT_LENGTH);
-	FrameBuffer_Construct(gFrameBuffers + 1, 0, SCREEN_HEIGHT);
-	OT_ConstructStatic(&gFrameBuffers[1].ot, gFrameBufOtEntries2, OT_LENGTH);
+	gFrameBuffers[0].Initialize(0, 0);
+	gFrameBuffers[1].Initialize(0, SCREEN_HEIGHT);
 
-	OT_Clear(&gFrameBuffers[0].ot);
-	OT_Clear(&gFrameBuffers[1].ot);
+	for (int i = 0; i < 2; i++)
+	{
+		gFrameBuffers[i].ot.pEntries = gFrameBufOtEntries[i];
+		gFrameBuffers[i].ot.nEntries = OT_LENGTH;
+		gFrameBuffers[i].ot.bStatic = true;
+		gFrameBuffers[i].ot.Clear();
+	}
 
-	Camera_Construct(&camera);
+	pCamera = new Camera;
 
 	Checkerboard_Initialize();
 	tpage = LoadTPage(gCheckerboardRgb, 2, 0, 384, 0, gCheckerboardWidth, gCheckerboardHeight);
-	Mesh_Construct(&checker);
-	Mesh_AllocateBuffers(&checker, sizeof(MeshTriGourTex) / 2, sizeof(POLY_GT3) / 2, 1);
-	memcpy(checker.pModelTris, plane, sizeof(MeshTriGourTex) * 2);
-	checker.pAttrs[0].attrCode = MESHPT_TRI_GOUR_TEX;
-	checker.pAttrs[0].nPrims = 2;
-	checker.pAttrs[0].tpageId = tpage;
-	Mesh_InitPrimBufs(&checker);
+	pChecker = new Mesh;
+	pChecker->AllocateBuffers(sizeof(MeshTriGourTex) / 2, sizeof(POLY_GT3) / 2, 1);
+	memcpy(pChecker->pModelTris, plane, sizeof(MeshTriGourTex) * 2);
+	pChecker->pAttrs[0].attrCode = MESHPT_TRI_GOUR_TEX;
+	pChecker->pAttrs[0].nPrims = 2;
+	pChecker->pAttrs[0].tpageId = tpage;
+	pChecker->InitPrimBufs();
 
 	DrawSync(0);
 	VSync(0);
 	SwapBuffers();
 
-	Cube_Construct(&cube);
-	cube.gameObj.pGCRender->worldMtx.t[2] = 500;
+	pCube = new Cube;
+	pCube->pGCRender->worldMtx.t[2] = 500;
 }
 
 void Update(void)
 {
-	ControllerType controllerType;
+	Input::Update();
 
-	Input_Update();
-
-	controllerType = Input_GetControllerType(0);
-	if (controllerType != CONTROLLER_NONE)
+	Input::ControllerType controllerType = Input::GetControllerType(0);
+	if (controllerType != Input::CONTROLLER_NONE)
 	{
-		if (Input_ButtonDown(BUTTON_DLEFT, 0)) camera.yaw -= 10;
-		if (Input_ButtonDown(BUTTON_DRIGHT, 0)) camera.yaw += 10;
-		if (Input_ButtonDown(BUTTON_DUP, 0)) camera.pitch += 10;
-		if (Input_ButtonDown(BUTTON_DDOWN, 0)) camera.pitch -= 10;
+		if (Input::ButtonDown(Input::BUTTON_DLEFT, 0)) pCamera->yaw -= 10;
+		if (Input::ButtonDown(Input::BUTTON_DRIGHT, 0)) pCamera->yaw += 10;
+		if (Input::ButtonDown(Input::BUTTON_DUP, 0)) pCamera->pitch += 10;
+		if (Input::ButtonDown(Input::BUTTON_DDOWN, 0)) pCamera->pitch -= 10;
 	}
-	Camera_ClampRotations(&camera);
+	pCamera->ClampRotations();
 }
 
 void SetupDraw(void)
 {
-	OT_Clear(&gpCurFrameBuf->ot);
+	gpCurFrameBuf->ot.Clear();
 }
 
 void BuildDrawCommands(void)
 {
-	GameObject* pObj = (GameObject*)&cube;
-
 	MATRIX mtx;
-	MATRIX* pCameraMtx = Camera_GetMatrix(&camera);
+	MATRIX* pCameraMtx = pCamera->GetCameraMatrix();
 
 	GORenderData renderData;
-	renderData.pCamera = &camera;
+	renderData.pCamera = pCamera;
 	renderData.frameBufIdx = gCurFrameBufIdx;
 	renderData.pFrameBuf = gpCurFrameBuf;
 
-	pObj->drawFunc(pObj, &renderData);
+	pCube->Draw(&renderData);
 
 	M_IdentityMatrix(&mtx);
 	mtx.t[2] = 500;
@@ -176,13 +174,13 @@ void BuildDrawCommands(void)
 
 	SetRotMatrix(&mtx);
 	SetTransMatrix(&mtx);
-	Mesh_Draw(&checker, gCurFrameBufIdx, &gpCurFrameBuf->ot);
+	pChecker->Draw(gCurFrameBufIdx, &gpCurFrameBuf->ot);
 }
 
 void IssueDraw(void)
 {
 	int prevBufIdx = gCurFrameBufIdx ^ 0x1;
-	OT_IssueToGpu(&gFrameBuffers[prevBufIdx].ot);
+	gFrameBuffers[prevBufIdx].ot.IssueToGpu();
 }
 
 void SwapBuffers(void)
@@ -192,4 +190,14 @@ void SwapBuffers(void)
 	gpCurFrameBuf = &gFrameBuffers[gCurFrameBufIdx];
 	PutDrawEnv(&gpCurFrameBuf->drawEnv);
 	ClearImage(&gpCurFrameBuf->drawEnv.clip, 25, 25, 25);
+}
+
+void* operator new(std::size_t n) throw(std::bad_alloc)
+{
+  	return malloc3(n);
+}
+
+void operator delete(void* p) throw()
+{
+  	free(p);
 }

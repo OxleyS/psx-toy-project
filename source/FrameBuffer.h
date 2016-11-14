@@ -4,13 +4,17 @@
 #include "Global.h"
 #include "OrderingTable.h"
 
-struct FrameBuffer
+class FrameBuffer
 {
+	public:
+
+	FrameBuffer();
+
+	void Initialize(int xOffset, int yOffset);
+
 	OrderingTable ot;
 	DRAWENV drawEnv;
 	DISPENV dispEnv;
 };
-
-void FrameBuffer_Construct(FrameBuffer* pSelf, int xOffset, int yOffset);
 
 #endif

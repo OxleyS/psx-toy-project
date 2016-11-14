@@ -84,24 +84,12 @@ MeshTriGour gCubeTris[] =
 };
 int gnCubeTris = sizeof(gCubeTris) / sizeof(MeshTriGour);
 
-Mesh* Cube_AllocateMesh();
-
-void Cube_Construct(Cube* pSelf)
+Cube::Cube()
 {
-    GCRender* pGCRender = (GCRender*)malloc(sizeof(GCRender));
+    pGCRender = new GCRender;
 
-    GameObject_Construct(&pSelf->gameObj);
-    GCRender_Construct(pGCRender);
-    pGCRender->pMesh = Cube_AllocateMesh();
-    pSelf->gameObj.pGCRender = pGCRender;
-}
-
-Mesh* Cube_AllocateMesh()
-{
-    Mesh* pMesh = (Mesh*)malloc3(sizeof(Mesh));
-
-    Mesh_Construct(pMesh);
-	Mesh_AllocateBuffers(pMesh, (sizeof(MeshTriGour) * gnCubeTris) / sizeof(u_long),
+    Mesh* pMesh = new Mesh;
+	pMesh->AllocateBuffers((sizeof(MeshTriGour) * gnCubeTris) / sizeof(u_long),
 		(sizeof(POLY_G3) * gnCubeTris) / sizeof(u_long),
 		1);
         
@@ -109,6 +97,6 @@ Mesh* Cube_AllocateMesh()
 	pMesh->pAttrs[0].attrCode = MESHPT_TRI_GOUR;
 	pMesh->pAttrs[0].nPrims = gnCubeTris;
 
-	Mesh_InitPrimBufs(pMesh);
-    return pMesh;
+	pMesh->InitPrimBufs();
+    pGCRender->pMesh = pMesh;
 }

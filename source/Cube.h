@@ -7,11 +7,11 @@
 extern MeshTriGour gCubeTris[];
 extern int gnCubeTris;
 
-typedef struct Cube
+class Cube : public GameObject
 {
-    GameObject gameObj;
-} Cube;
+    public:
 
-void Cube_Construct(Cube* pSelf);
+    Cube();
+};
 
 #endif
