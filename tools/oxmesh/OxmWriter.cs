@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace OxMesh
 {
@@ -20,8 +21,9 @@ namespace OxMesh
             this.oxmContents = ConstructOxm();
         }
 
-        public void WriteToFile(string outFilePath)
+        public void WriteToFile(string outFilePath, int scaleFactor)
         {
+            oxmContents.scaleFactor = scaleFactor;
             WriteOxm(outFilePath);
         }
 
@@ -87,16 +89,33 @@ namespace OxMesh
                         return false;
                 }
             }
+
+            public bool IsQuad()
+            {
+                switch (polyType)
+                {
+                    case PolygonType.PolyF4:
+                    case PolygonType.PolyFT4:
+                    case PolygonType.PolyG4:
+                    case PolygonType.PolyGT4:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
         }
 
         private class OxmContents
         {
+            public int scaleFactor = 1;
             public List<string> textureNames = new List<string>();
             public List<Attribute> attribTable = new List<Attribute>();
         }
 
         private OxmContents ConstructOxm()
         {
+            if (!ProgramArgs.inst.bQuiet) Console.WriteLine("INFO: Constructing OXM data from the parsed RSD fileset.");
+
             OxmContents oxm = new OxmContents();
             oxm.textureNames = new List<string>(parsedRsd.rsd.texFiles);
 
@@ -105,7 +124,7 @@ namespace OxMesh
                 // Retrieve and translate polygon and material information
                 Attribute.LightingType lightType = TranslateLightType(mat);
                 RsdFilesetParser.PlyContents.Polygon plyPoly = parsedRsd.ply.polys[mat.polyIdx];
-                int semiCode = mat.bSemiTransparent ? -1 : mat.semiTransparentCode;
+                int semiCode = mat.bSemiTransparent ? mat.semiTransparentCode : -1;
                 Attribute.PolygonType polyType;
                 Attribute attr = null;
                 bool bQuad;
@@ -196,6 +215,10 @@ namespace OxMesh
                 attr.polygons.Add(oxmPoly);
             }
 
+            int nPolys = 0;
+            foreach (Attribute attr in oxm.attribTable) nPolys += attr.polygons.Count;
+            if (!ProgramArgs.inst.bQuiet) Console.WriteLine("INFO: OXM data constructed: {0} polygons, over {1} attributes.", nPolys, oxm.attribTable.Count);
+
             return oxm;
         }
 
@@ -233,7 +256,92 @@ namespace OxMesh
 
         private void WriteOxm(string outFilePath)
         {
-            throw new WriteException("Haven't written this yet!");
+            byte version = 1;
+            int scaleFactor = oxmContents.scaleFactor;
+
+            if (!ProgramArgs.inst.bQuiet) Console.WriteLine("INFO: Writing OXM file with scale factor {0}.", scaleFactor);
+
+            // BinaryWriter's docs says it uses little-endian, so we
+            // don't have to do anything special for that
+            using (BinaryWriter writer = new BinaryWriter(new FileStream(outFilePath, FileMode.Create), Encoding.ASCII))
+            {
+                writer.Write(version);
+                
+                // Header
+                writer.Write(scaleFactor);
+                
+                // Texture name table
+                writer.Write((byte)oxmContents.textureNames.Count);
+                foreach (string texName in oxmContents.textureNames)
+                {
+                    // We write out strings manually to be more compact
+                    writer.Write((byte)texName.Length);
+                    writer.Write(texName.ToCharArray());
+                }
+
+                // Attribute table (minus the polygons)
+                foreach (Attribute attr in oxmContents.attribTable)
+                {
+                    byte flags = 0;
+                    if (attr.bDoubleSided) flags |= 0x1;
+
+                    writer.Write((byte)attr.polyType);
+                    writer.Write((byte)attr.lightType);
+                    writer.Write((byte)attr.semiTransparentCode);
+                    writer.Write((byte)attr.textureIndex);
+                    writer.Write(flags);
+                }
+
+                // The polys from each attribute, all concatenated together
+                foreach (Attribute attr in oxmContents.attribTable)
+                {
+                    foreach (Polygon poly in attr.polygons)
+                    {
+                        WriteOxmVertex(poly.v1, attr, true, scaleFactor, writer);
+                        WriteOxmVertex(poly.v2, attr, false, scaleFactor, writer);
+                        WriteOxmVertex(poly.v3, attr, false, scaleFactor, writer);
+                        if (attr.IsQuad()) WriteOxmVertex(poly.v4, attr, false, scaleFactor, writer);
+                    }
+                }
+            }
+
+            if (!ProgramArgs.inst.bQuiet) Console.WriteLine("INFO: OXM file successfully written.", scaleFactor);
+        }
+
+        private void WriteOxmVertex(Vertex vert, Attribute attr, bool bFirstVert, int scaleFactor, BinaryWriter writer)
+        {
+            writer.Write((short)(vert.pos.x * scaleFactor));
+            writer.Write((short)(vert.pos.y * scaleFactor));
+            writer.Write((short)(vert.pos.z * scaleFactor));
+
+            // For flat lighting, only write the first normal
+            if (attr.lightType != Attribute.LightingType.None
+                && (bFirstVert || attr.lightType == Attribute.LightingType.Smooth))
+            {
+                writer.Write(EncodeGteFloat(vert.normal.x));
+                writer.Write(EncodeGteFloat(vert.normal.y));
+                writer.Write(EncodeGteFloat(vert.normal.z));
+            }
+
+            // For flat coloring, only write the first color
+            if (bFirstVert || attr.IsGouraud())
+            {
+                writer.Write((byte)vert.color.r);
+                writer.Write((byte)vert.color.g);
+                writer.Write((byte)vert.color.b);
+            }
+
+            if (attr.IsTextured())
+            {
+                writer.Write((byte)vert.uv.x);
+                writer.Write((byte)vert.uv.y);
+            }
+        }
+
+        // 1 sign bit, 3 whole bits, 12 fractional bits
+        private short EncodeGteFloat(float val)
+        {
+            return (short)(val * (1 << 12));
         }
     }
 }
