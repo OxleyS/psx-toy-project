@@ -32,4 +32,11 @@ typedef struct MeshAttr MeshAttr;
 typedef struct MeshTriGour MeshTriGour;
 typedef struct MeshTriGourTex MeshTriGourTex;
 
+// Custom replacements of the crappy ones provided by the BIOS
+namespace Memory
+{
+    void* Copy(void* pDest, const void* pSrc, int nBytes);
+    void* Set(void* pDest, int value, int nBytes);
+}
+
 #endif

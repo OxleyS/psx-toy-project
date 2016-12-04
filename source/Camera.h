@@ -3,6 +3,7 @@
 
 #include "Global.h"
 #include "GameObject.h"
+#include "Math.h"
 
 struct Camera : GameObject
 {
@@ -11,13 +12,13 @@ struct Camera : GameObject
     Camera();
 
     void ClampRotations();
-    MATRIX* GetCameraMatrix();
+    Matrix* GetCameraMatrix();
 
     short m_Yaw;
     short m_Pitch;
     short m_Roll;
-    MATRIX m_CameraMtx;
-    SVECTOR m_Position;
+    Matrix m_CameraMtx;
+    Vec3Short m_Position;
     u_char m_bDirty;
 };
 

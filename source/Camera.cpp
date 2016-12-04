@@ -1,13 +1,12 @@
 #include "Camera.h"
-#include "Math.h"
 
 Camera::Camera()
 {
     m_Yaw = 0;
     m_Pitch = 0;
     m_Roll = 0;
-    Math::IdentityMatrix(&m_CameraMtx);
-    Math::ZeroVector(&m_Position);
+    m_CameraMtx = Matrix::Identity; 
+    m_Position = Vec3Short::Zero;
     m_bDirty = 0;
 }
 
@@ -22,16 +21,21 @@ void Camera::ClampRotations()
     m_bDirty = 1;
 }
 
-MATRIX* Camera::GetCameraMatrix() 
+Matrix* Camera::GetCameraMatrix() 
 {
     if (m_bDirty)
     {
-        SVECTOR rotAmt = { m_Pitch, m_Yaw, m_Roll, 0 };
+        Vec3Short rotAmt(m_Pitch, m_Yaw, m_Roll);
         RotMatrixYXZ_gte(&rotAmt, &m_CameraMtx);
         TransposeMatrix(&m_CameraMtx, &m_CameraMtx);
-        m_CameraMtx.t[0] = -(Math::DotProduct((SVECTOR*)m_CameraMtx.m[0], &m_Position) >> 12);
-        m_CameraMtx.t[1] = -(Math::DotProduct((SVECTOR*)m_CameraMtx.m[1], &m_Position) >> 12);
-        m_CameraMtx.t[2] = -(Math::DotProduct((SVECTOR*)m_CameraMtx.m[2], &m_Position) >> 12);
+
+        // TODO: Won't really work with position being Vec3Short
+        // May need to regen cam matrix per-object using position
+        // relative to the camera (but transposed rotation can be cached)
+        m_CameraMtx.t[0] = -(((const Vec3Short&)m_CameraMtx.m[0][0]).Dot(m_Position) >> 12);
+        m_CameraMtx.t[1] = -(((const Vec3Short&)m_CameraMtx.m[1][0]).Dot(m_Position) >> 12);
+        m_CameraMtx.t[2] = -(((const Vec3Short&)m_CameraMtx.m[2][0]).Dot(m_Position) >> 12);
+
         m_bDirty = 0;
     }
 

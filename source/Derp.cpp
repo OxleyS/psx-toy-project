@@ -121,7 +121,7 @@ void Initialize(void)
 	tpage = LoadTPage(g_CheckerboardRgb, 2, 0, 384, 0, g_CheckerboardWidth, g_CheckerboardHeight);
 	pChecker = new Mesh;
 	pChecker->AllocateBuffers(sizeof(MeshTriGourTex) / 2, sizeof(POLY_GT3) / 2, 1);
-	memcpy(pChecker->m_pModelTris, plane, sizeof(MeshTriGourTex) * 2);
+	Memory::Copy(pChecker->m_pModelTris, plane, sizeof(MeshTriGourTex) * 2);
 	pChecker->m_pAttrs[0].attrCode = MESHPT_TRI_GOUR_TEX;
 	pChecker->m_pAttrs[0].nPrims = 2;
 	pChecker->m_pAttrs[0].tpageId = tpage;
@@ -157,8 +157,8 @@ void SetupDraw(void)
 
 void BuildDrawCommands(void)
 {
-	MATRIX mtx;
-	MATRIX* pCameraMtx = pCamera->GetCameraMatrix();
+	Matrix mtx;
+	Matrix* pCameraMtx = pCamera->GetCameraMatrix();
 
 	GORenderData renderData;
 	renderData.pCamera = pCamera;
@@ -167,10 +167,10 @@ void BuildDrawCommands(void)
 
 	pCube->Draw(&renderData);
 
-	Math::IdentityMatrix(&mtx);
+	mtx = Matrix::Identity;
 	mtx.t[2] = 500;
 	
-	Math::MulMatrixTrans(&mtx, pCameraMtx);
+	mtx.MulInPlace(*pCameraMtx);
 
 	SetRotMatrix(&mtx);
 	SetTransMatrix(&mtx);

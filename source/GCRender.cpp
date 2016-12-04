@@ -9,16 +9,16 @@
 GCRender::GCRender()
 {
     m_pMesh = NULL;
-    Math::IdentityMatrix(&m_WorldMtx);
+    m_WorldMtx = Matrix::Identity;
 }
 
 void GCRender::DrawMesh(GORenderData* pRenderData)
 {
-    MATRIX mtx;
+    Matrix mtx;
 
     if (!m_pMesh) return;
     
-    Math::MulMatrixTransOut(&m_WorldMtx, pRenderData->pCamera->GetCameraMatrix(), &mtx);
+    m_WorldMtx.Mul(*pRenderData->pCamera->GetCameraMatrix(), mtx);
 	SetRotMatrix(&mtx);
 	SetTransMatrix(&mtx);
 
