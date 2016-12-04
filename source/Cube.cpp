@@ -93,7 +93,7 @@ Cube::Cube()
 		(sizeof(POLY_G3) * g_nCubeTris) / sizeof(u_long),
 		1);
         
-    memcpy(pMesh->m_pModelTris, g_CubeTris, sizeof(MeshTriGour) * g_nCubeTris);
+    Memory::Copy(pMesh->m_pModelTris, g_CubeTris, sizeof(MeshTriGour) * g_nCubeTris);
 	pMesh->m_pAttrs[0].attrCode = MESHPT_TRI_GOUR;
 	pMesh->m_pAttrs[0].nPrims = g_nCubeTris;
 

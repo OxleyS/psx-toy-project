@@ -1,8 +1,6 @@
 #include "Mesh.h"
 #include "OrderingTable.h"
 
-#include <memory.h>
-
 union InTriType
 {
 	MeshTriGour* mtg;
@@ -17,7 +15,7 @@ union OutPolyType
 
 Mesh::Mesh()
 {
-	memset(this, 0, sizeof(Mesh));
+	Memory::Set(this, 0, sizeof(Mesh));
 }
 
 Mesh::~Mesh()
