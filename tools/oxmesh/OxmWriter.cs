@@ -256,7 +256,7 @@ namespace OxMesh
 
         private void WriteOxm(string outFilePath)
         {
-            byte version = 1;
+            int version = 1;
             int scaleFactor = oxmContents.scaleFactor;
 
             if (!ProgramArgs.inst.bQuiet) Console.WriteLine("INFO: Writing OXM file with scale factor {0}.", scaleFactor);
@@ -271,25 +271,38 @@ namespace OxMesh
                 writer.Write(scaleFactor);
                 
                 // Texture name table
+                int nUnpadded = 1;
                 writer.Write((byte)oxmContents.textureNames.Count);
                 foreach (string texName in oxmContents.textureNames)
                 {
                     // We write out strings manually to be more compact
                     writer.Write((byte)texName.Length);
                     writer.Write(texName.ToCharArray());
+                    nUnpadded += texName.Length + 1;
                 }
 
+                // Pad to 32-bit boundary
+                for (int i = 0; i < 4 - (nUnpadded % 4); i++) writer.Write((byte)0);
+
                 // Attribute table (minus the polygons)
+                writer.Write(oxmContents.attribTable.Count);
                 foreach (Attribute attr in oxmContents.attribTable)
                 {
                     byte flags = 0;
                     if (attr.bDoubleSided) flags |= 0x1;
+
+                    writer.Write(attr.polygons.Count);
 
                     writer.Write((byte)attr.polyType);
                     writer.Write((byte)attr.lightType);
                     writer.Write((byte)attr.semiTransparentCode);
                     writer.Write((byte)attr.textureIndex);
                     writer.Write(flags);
+
+                    // Pad to 32-bit boundary
+                    writer.Write((byte)0);
+                    writer.Write((byte)0);
+                    writer.Write((byte)0);
                 }
 
                 // The polys from each attribute, all concatenated together
@@ -313,6 +326,7 @@ namespace OxMesh
             writer.Write((short)(vert.pos.x * scaleFactor));
             writer.Write((short)(vert.pos.y * scaleFactor));
             writer.Write((short)(vert.pos.z * scaleFactor));
+            writer.Write((short)0); // Padding
 
             // For flat lighting, only write the first normal
             if (attr.lightType != Attribute.LightingType.None
@@ -321,6 +335,7 @@ namespace OxMesh
                 writer.Write(EncodeGteFloat(vert.normal.x));
                 writer.Write(EncodeGteFloat(vert.normal.y));
                 writer.Write(EncodeGteFloat(vert.normal.z));
+                writer.Write((short)0); // Padding
             }
 
             // For flat coloring, only write the first color
@@ -329,12 +344,14 @@ namespace OxMesh
                 writer.Write((byte)vert.color.r);
                 writer.Write((byte)vert.color.g);
                 writer.Write((byte)vert.color.b);
+                writer.Write((byte)0); // Padding
             }
 
             if (attr.IsTextured())
             {
                 writer.Write((byte)vert.uv.x);
                 writer.Write((byte)vert.uv.y);
+                writer.Write((short)0); // Padding
             }
         }
 

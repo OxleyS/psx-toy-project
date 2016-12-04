@@ -6,6 +6,7 @@ set SOURCEDIR=source
 set DISTDIR=dist
 set MMGMOBJDIR=C:\psyq\beta\mmgm\OBJ
 set LIBDIR=C:\psyq\lib
+set MKPSXISODIR=..\mkpsxiso\prebuilt
 
 echo Clearing out previous build files...
 del /Q %BUILDDIR%\*
@@ -14,10 +15,14 @@ echo Compiling...
 for %%i in (%SOURCEDIR%\*.cpp) do ccpsx -O3 -c %SOURCEDIR%\%%~ni.cpp -o %BUILDDIR%\%%~ni.obj -Wall
 
 echo Linking...
-ccpsx -O3 -Xo$80010000 %BUILDDIR%\*.obj %MMGMOBJDIR%\MMGMNEW.OBJ -l %LIBDIR%\LIBPAD.LIB -o %BUILDDIR%\main.cpe
+ccpsx -O3 -Xo$80010000 %BUILDDIR%\*.obj %MMGMOBJDIR%\MMGMNEW.OBJ -l %LIBDIR%\LIBPAD.LIB -l %LIBDIR%\LIBDS.LIB -o %BUILDDIR%\main.cpe
 
 echo Building final EXE...
 cpe2x %BUILDDIR%\main.cpe
-move %BUILDDIR%\MAIN.EXE %DISTDIR%\MAIN.EXE
+
+echo Building CD-ROM image...
+%MKPSXISODIR%\mkpsxiso -y cdbuild\derp.xml
+
+echo Build finished.
 
 endlocal

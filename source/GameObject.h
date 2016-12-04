@@ -3,6 +3,10 @@
 
 #include "Global.h"
 
+class Camera;
+class FrameBuffer;
+class GCRender;
+
 struct GORenderData
 {
     Camera* pCamera;
