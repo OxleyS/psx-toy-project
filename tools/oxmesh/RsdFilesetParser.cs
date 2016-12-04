@@ -87,7 +87,7 @@ namespace OxMesh
 
         public Parsed ParseRsdFileset(string rsdFilename)
         {
-            Console.WriteLine("INFO: Beginning parsing of RSD fileset.");
+            if (!ProgramArgs.inst.bQuiet) Console.WriteLine("INFO: Beginning parsing of RSD fileset.");
 
             Parsed parsed = new Parsed();
             parsed.rsd = ParseRsd(rsdFilename);
@@ -97,7 +97,7 @@ namespace OxMesh
             if (!string.IsNullOrWhiteSpace(parsed.rsd.matPath))
                 parsed.mat = ParseMat(parsed.rsd.matPath);
 
-            Console.WriteLine("INFO: Entire RSD fileset parsed successfully.");
+            if (!ProgramArgs.inst.bQuiet) Console.WriteLine("INFO: Entire RSD fileset parsed successfully.");
             return parsed;
         }
 
@@ -120,7 +120,7 @@ namespace OxMesh
                     if (line[0] == '@')
                     {
                         if (bVersionSeen) throw new ParseException("Duplicate version descriptor in RSD file", line);
-                        Console.WriteLine("INFO: Parsing RSD Version " + line.Substring(1));
+                        if (!ProgramArgs.inst.bQuiet) Console.WriteLine("INFO: Parsing RSD Version " + line.Substring(1));
                         bVersionSeen = true;
                         continue;
                     }
@@ -157,7 +157,7 @@ namespace OxMesh
                 }
             }
 
-            Console.WriteLine("INFO: RSD parsed successfully.");
+            if (!ProgramArgs.inst.bQuiet) Console.WriteLine("INFO: RSD parsed successfully.");
             return rsd;
         }
 
@@ -195,7 +195,7 @@ namespace OxMesh
                     if (line[0] == '@')
                     {
                         if (bVersionSeen) throw new ParseException("Duplicate version descriptor in PLY file", line);
-                        Console.WriteLine("INFO: Parsing PLY Version " + line.Substring(1));
+                        if (!ProgramArgs.inst.bQuiet) Console.WriteLine("INFO: Parsing PLY Version " + line.Substring(1));
                         bVersionSeen = true;
                         continue;
                     }
@@ -261,7 +261,7 @@ namespace OxMesh
             if (nNormalsSeen < ply.normals.Length) throw new ParseException("Missing normals in PLY file");
             if (nPolysSeen < ply.polys.Length) throw new ParseException("Missing polygons in PLY file");
 
-            Console.WriteLine("INFO: PLY parsed successfully.");
+            if (!ProgramArgs.inst.bQuiet) Console.WriteLine("INFO: PLY parsed successfully.");
             return ply;
         }
 
@@ -297,7 +297,7 @@ namespace OxMesh
                     if (line[0] == '@')
                     {
                         if (bVersionSeen) throw new ParseException("Duplicate version descriptor in MAT file", line);
-                        Console.WriteLine("INFO: Parsing MAT Version " + line.Substring(1));
+                        if (!ProgramArgs.inst.bQuiet) Console.WriteLine("INFO: Parsing MAT Version " + line.Substring(1));
                         bVersionSeen = true;
                         continue;
                     }
@@ -407,7 +407,7 @@ namespace OxMesh
             }
 
             mat.materials = matDescriptors.ToArray();
-            Console.WriteLine("INFO: MAT parsed successfully.");
+            if (!ProgramArgs.inst.bQuiet) Console.WriteLine("INFO: MAT parsed successfully.");
             return mat;
         }
 

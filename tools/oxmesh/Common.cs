@@ -6,6 +6,16 @@ using System.Threading.Tasks;
 
 namespace OxMesh
 {
+    public struct ProgramArgs
+    {
+        public static ProgramArgs inst;
+
+        public string rsdInput;
+        public string oxmOutput;
+        public int scaleFactor;
+        public bool bQuiet;
+    }
+
     struct RgbColor
     {
         public RgbColor(int r, int g, int b)
