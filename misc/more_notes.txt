@@ -1,0 +1,68 @@
+Be careful when using any standard library function - a lot of them have bugs!
+Check with the no$psx specs, under BIOS functions
+
+Also, there's some BIOS patches used by other games that I may have to apply myself. Again, see no$psx specs
+
+=================================================
+
+Yes, you must initialise the heap. It only needs to be initialised once.
+
+The code below will allocate 1MB of RAM as heap.
+The heap is a set chunk of the remaining RAM that can only be used for malloc functions.
+Any other RAM left can be used for other things if you wish, but it is wise to try and get as much of the RAM as you can into the heap, while leaving enough stack space for your game/program.
+
+You should remember that the heap works its way down, starting from the stack:
+CODE: SELECT ALL
+printf("\nReserving 1024KB (1,048,576 Bytes) RAM... ");
+InitHeap3((void*)0x800F8000, 0x00100000);
+printf("Success");
+
+You can see this code is set to start from a 16KB stack (0x800F8000). If this is too small, you must recalculate and adjust it as needed.
+
+The RAM and Stack are set using (though the RAM definition is only usually needed if you are working with the DTL-H2x00 development boards as they allow up to 8MB of RAM) :
+CODE: SELECT ALL
+unsigned long __ramsize =   0x00200000; // 2 Megabytes of RAM
+unsigned long __stacksize = 0x00004000; // 16 Kilobytes of Stack
+
+Make sure you are also using MMGMNEW.OBJ during the compilation or else you will receive errors and may be using the old malloc libs.
+
+In case another googler passing by here, that OBJ file is located in the PsyQ devkit:
+CODE: SELECT ALL
+C:\psyq>find . -iname MMGMNEW.OBJ
+.\beta\mmgm\OBJ\MMGMNEW.OBJ
+
+GTE VECTOR-MTX multiplication has the vector on the right side! This is different from DX, which has it on the left!!!
+
+PSX colors:
+16-bit format: SBBBBBGGGGGRRRRR
+Vertex colors need to be 128 to use texture color as is
+
+===========================================================================
+
+Scratchpad Note
+The kernel doesn't include any allocation functions for the scratchpad (nor do any kernel functions use that memory area),
+so the executable can freely use the "fast" memory at 1F800000h..1F8003FFh.
+SEAN: This might be good to do collision or visibility culling
+
+==========================================
+
+Like most A(NNh) functions, below functions are executed in uncached BIOS ROM, the ROM has very high waitstates, and the 32bit opcodes are squeezed through an 8bit bus. Moreover, below functions are restricted to process the data byte-by-byte. So, they are very-very-very slow, don't even think about using them.
+Of course, that applies also for most other BIOS functions. But it's becoming most obvious for these small functions; memcpy takes circa 160 cycles per byte (reasonable would be less than 4 cycles), and bzero takes circa 105 cycles per byte (reasonable would be less than 1 cycles).
+
+A(2Ah) - memcpy(dst, src, len)
+Copies len bytes from [src..src+len-1] to [dst..dst+len-1]. Refuses to copy any data when dst=00000000h or when len>7FFFFFFFh. The return value is always the incoming "dst" value.
+
+A(2Bh) - memset(dst, fillbyte, len)
+Fills len bytes at [dst..dst+len-1] with the fillbyte value. Refuses to fill memory when dst=00000000h or when len>7FFFFFFFh. The return value is the incoming "dst" value (or zero, when len=0 or len>7FFFFFFFh).
+
+A(2Ch) - memmove(dst, src, len) - bugged
+Same as memcpy, but (attempts) to support overlapping src/dst regions, by using a backwards transfer when src<dst (and, for some reason, only when dst>=src+len).
+BUG: The backwards variant accidently transfers len+1 bytes from [src+len..src] down to [dst+len..dst].
+
+A(2Dh) - memcmp(src1, src2, len) - bugged
+Compares len bytes at [src1..src1+len-1] with [src2..src2+len-1], and (attempts) to return the difference between the first mismatching bytes, ie. [src1+N]-[src2+N], or 0 if there are no mismatches. Refuses to compare data when src1 or src2 is 00000000h, and returns 0 in that case.
+BUG: Accidently returns the difference between the bytes AFTER the first mismatching bytes, ie. [src1+N+1]-[src2+N+1].
+That means that a return value of 0 can mean absolutely anything: That the memory blocks are identical, or that a mismatch has been found (but that the NEXT byte after the mismatch does match), or that the function has failed (due to src1 or src2 being 00000000h).
+
+A(2Eh) - memchr(src, scanbyte, len)
+Scans [src..src+len-1] for the first occurence of scanbyte. Refuses to scan any data when src=00000000h or when len>7FFFFFFFh. Returns the address of that first occurence, or 0 if the scanbyte wasn't found.

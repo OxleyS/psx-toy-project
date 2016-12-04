@@ -1,0 +1,11 @@
+- TODO:
+	- Set up 2D clipping rect every frame
+	- Set up projection variable h
+
+- Use malloc3 instead of malloc. Fixes a bug that causes fragmentation
+- I think MGS created an OT for individual objects, but essentially treated each level poly as a separate object.
+	- Evidenced by Snake being visible through door as soon as it opened
+	
+- RotTrans works with origin at top left, I think. RotTransPers, though, puts origin at center. But -Y is still up (wtf lol)
+	
+ccpsx -O3 -Xo$80010000 %%i -obuild\main.cpe,build\main.sym,build\mem.map
