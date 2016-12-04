@@ -18,25 +18,29 @@
 #define SCREEN_CENTER_X (SCREEN_WIDTH / 2)
 #define SCREEN_CENTER_Y (SCREEN_HEIGHT / 2)
 
-typedef struct OrderingTable OrderingTable;
-typedef struct FrameBuffer FrameBuffer;
-
-typedef struct GameObject GameObject;
-typedef struct GORenderData GORenderData;
-typedef struct GCRender GCRender;
-
-typedef struct Camera Camera;
-
-typedef struct Mesh Mesh;
-typedef struct MeshAttr MeshAttr;
-typedef struct MeshTriGour MeshTriGour;
-typedef struct MeshTriGourTex MeshTriGourTex;
-
 // Custom replacements of the crappy ones provided by the BIOS
 namespace Memory
 {
     void* Copy(void* pDest, const void* pSrc, int nBytes);
     void* Set(void* pDest, int value, int nBytes);
+}
+
+class OrderingTable;
+namespace Debug
+{
+    void PrintHeaderToName(const char* pType, const char* pName);
+    void PrintHeader(const char* pType, const char* pName);
+    void PrintFooter();
+    void PrintShort(short val, const char* pName);
+    void PrintLong(long val, const char* pName);
+    void PrintUshort(u_short val, const char* pName);
+    void PrintUshortHex(u_short val, const char* pName);
+    void PrintUlong(u_long val, const char* pName);
+    void PrintUlongHex(u_long val, const char* pName);
+    void PrintMatrix(const MATRIX* pMtx, const char* pName);
+    void PrintSvector(const SVECTOR* pVec, const char* pName);
+    void PrintOt(const OrderingTable* pOt, const char* pName);
+    void PrintPolyGT3(const POLY_GT3* pPoly, const char* pName);
 }
 
 #endif

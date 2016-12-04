@@ -4,7 +4,6 @@
 #include "Mesh.h"
 #include "FrameBuffer.h"
 #include "GameObject.h"
-#include "Debug.h"
 
 GCRender::GCRender()
 {

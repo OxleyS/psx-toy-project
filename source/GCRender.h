@@ -4,6 +4,9 @@
 #include "Global.h"
 #include "Math.h"
 
+class GORenderData;
+class Mesh;
+
 class GCRender
 {
     public:

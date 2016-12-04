@@ -2,20 +2,21 @@
 
 #include <libetc.h>
 #include <stdio.h>
+#include <libds.h>
 
 #include "Math.h"
-#include "Debug.h"
 #include "FrameBuffer.h"
 #include "Mesh.h"
 #include "Input.h"
 #include "Cube.h"
+#include "TestObject.h"
 #include "Checkerboard.h"
 #include "Camera.h"
 #include "GameObject.h"
 #include "GCRender.h"
 
 u_long __ramsize   = 0x00200000; // force 2 megabytes of RAM
-u_long __stacksize = 0x00004000; // force 16 kilobytes of stack
+u_long __stacksize = 0x00007FF0; // force (almost) 32 kilobytes of stack
 
 const u_char g_Debug = 1;
 
@@ -33,19 +34,27 @@ static VideoMode g_VideoMode;
 
 Mesh* pChecker;
 Camera* pCamera;
-Cube* pCube;
+GameObject* pGameObject;
+
+struct MeshTriGourTex
+{
+	MeshPoly::Color c0, c1, c2;
+	MeshPoly::Position p0, p1, p2;
+	MeshPoly::UVCoords uv0, uv1, uv2;
+	u_char pad0, pad1;
+};
 
 MeshTriGourTex plane[2] =
 {
-	{ 
-		{ -150, 64, -150, 0 }, { 128, 128, 128 }, 0, 64, 0,
-		{ -150, 64, 150, 0 }, { 128, 128, 128 }, 0, 0, 0,
-		{ 150, 64, -150, 0 }, { 128, 128, 128 }, 64, 64, 0
+	{
+		{ 128, 128, 128 }, { 128, 128, 128 }, { 128, 128, 128 },
+		{ -150, 64, -150, 0 }, { -150, 64, 150, 0 }, { 150, 64, -150, 0 },
+		{ 0, 64 }, { 0, 0 }, { 64, 64 }, 0, 0
 	},
 	{ 
-		{ -150, 64, 150, 0 }, { 128, 128, 128 }, 0, 0, 0,
-		{ 150, 64, 150, 0 }, { 128, 128, 128 }, 64, 0, 0,
-		{ 150, 64, -150, 0 }, { 128, 128, 128 }, 64, 64, 0
+		{ 128, 128, 128 }, { 128, 128, 128 }, { 128, 128, 128 },
+		{ -150, 64, 150, 0 }, { 150, 64, 150, 0 }, { 150, 64, -150, 0 },
+		{ 0, 0 }, { 64, 0 }, { 64, 64} , 0, 0
 	}
 };
 
@@ -96,6 +105,8 @@ void Initialize(void)
 		g_VideoMode = VIDEOMODE_NTSC;
 		SetVideoMode(0);
 	}
+
+	DsInit();
 	
 	ResetGraph(0);
 	Input::Initialize(0);
@@ -121,9 +132,13 @@ void Initialize(void)
 	tpage = LoadTPage(g_CheckerboardRgb, 2, 0, 384, 0, g_CheckerboardWidth, g_CheckerboardHeight);
 	pChecker = new Mesh;
 	pChecker->AllocateBuffers(sizeof(MeshTriGourTex) / 2, sizeof(POLY_GT3) / 2, 1);
-	Memory::Copy(pChecker->m_pModelTris, plane, sizeof(MeshTriGourTex) * 2);
-	pChecker->m_pAttrs[0].attrCode = MESHPT_TRI_GOUR_TEX;
-	pChecker->m_pAttrs[0].nPrims = 2;
+	Memory::Copy(pChecker->m_pMeshPolys, plane, sizeof(MeshTriGourTex) * 2);
+	pChecker->m_pAttrs[0].nPolys = 2;
+	pChecker->m_pAttrs[0].polyType = MeshPoly::MESHPT_TRI_GOUR_TEX;
+	pChecker->m_pAttrs[0].lightType = MeshPoly::MESHPL_NONE;
+	pChecker->m_pAttrs[0].semitransparentCode = 0xFF;
+	pChecker->m_pAttrs[0].flags = 0;
+	pChecker->m_pAttrs[0].clutId = tpage;	
 	pChecker->m_pAttrs[0].tpageId = tpage;
 	pChecker->InitPrimBufs();
 
@@ -131,8 +146,8 @@ void Initialize(void)
 	VSync(0);
 	SwapBuffers();
 
-	pCube = new Cube;
-	pCube->m_pGCRender->m_WorldMtx.t[2] = 500;
+	pGameObject = new Cube;
+	pGameObject->m_pGCRender->m_WorldMtx.t[2] = 500;
 }
 
 void Update(void)
@@ -165,7 +180,7 @@ void BuildDrawCommands(void)
 	renderData.frameBufIdx = g_CurFrameBufIdx;
 	renderData.pFrameBuf = g_pCurFrameBuf;
 
-	pCube->Draw(&renderData);
+	pGameObject->Draw(&renderData);
 
 	mtx = Matrix::Identity;
 	mtx.t[2] = 500;
