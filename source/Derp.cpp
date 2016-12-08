@@ -146,7 +146,7 @@ void Initialize(void)
 	VSync(0);
 	SwapBuffers();
 
-	pGameObject = new Cube;
+	pGameObject = new TestObject;
 	pGameObject->m_pGCRender->m_WorldMtx.t[2] = 500;
 }
 

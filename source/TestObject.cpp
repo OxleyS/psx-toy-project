@@ -27,6 +27,6 @@ TestObject::TestObject()
 	do { nRemainingSectors = DsReadSync(execResult); } while(nRemainingSectors);
 
     Mesh* pMesh = new Mesh;
-    pMesh->InitFromLoadedOxm(pCdBuf);
+    pMesh->InitFromLoadedOxm(pCdBuf, fileInfo.size);
     m_pGCRender->m_pMesh = pMesh;
 }

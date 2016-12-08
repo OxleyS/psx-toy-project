@@ -79,7 +79,6 @@ DEF_INIT_PRIM(GT3)
 	INIT_PRIM_COLOR(1)
 	INIT_PRIM_COLOR(2)
 	pInPoly += 9;
-	printf("Copying UV from offset %d, value %lu\n", (pInPoly - pIn), *pInPoly);
 	INIT_PRIM_UV(0)
 	INIT_PRIM_UV(1)
 	INIT_PRIM_UV(2)
@@ -108,16 +107,22 @@ InitPrimFunc g_InitPrimFuncTable[] =
 	InitGT3Prims, InitGT4Prims
 };
 
+void DrawPolyF3(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_long*& pOut);
+void DrawPolyF4(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_long*& pOut);
 void DrawPolyG3(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_long*& pOut);
+void DrawPolyG4(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_long*& pOut);
+void DrawPolyFT3(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_long*& pOut);
+void DrawPolyFT4(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_long*& pOut);
 void DrawPolyGT3(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_long*& pOut);
+void DrawPolyGT4(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_long*& pOut);
 
 typedef void (*DrawPrimFunc)(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_long*& pOut);
 DrawPrimFunc g_DrawPrimFuncTable[] =
 {
-	NULL, NULL,//DrawPolyF3, DrawPolyF4,
-	DrawPolyG3, NULL,//DrawPolyG4,
-	NULL, NULL,//DrawPolyFT3, DrawPolyFT4,
-	DrawPolyGT3, NULL//DrawPolyGT4
+	DrawPolyF3, DrawPolyF4,
+	DrawPolyG3, DrawPolyG4,
+	DrawPolyFT3, DrawPolyFT4,
+	DrawPolyGT3, DrawPolyGT4
 };
 
 Mesh::Mesh()
@@ -138,8 +143,9 @@ void Mesh::FreeBuffers()
 	if (m_pPrims[1]) delete[] m_pPrims[1];
 }
 
-void Mesh::InitFromLoadedOxm(u_long* pOxmBuf)
+void Mesh::InitFromLoadedOxm(u_long* pOxmBuf, int nBytes)
 {
+	u_char* pBufStart = (u_char*)pOxmBuf;
 	u_char* pByteBuf;
 
 	printf("PARSING OXM BUFFER\n");
@@ -208,12 +214,13 @@ void Mesh::InitFromLoadedOxm(u_long* pOxmBuf)
 
 		printf("\tATTR %d: %d bytes per poly, %d bytes per prim\n", i, polyStride, primStride);
 		totalPolyBytes += polyStride * attr.nPolys;
-		totalPrimBytes += primStride;
+		totalPrimBytes += primStride * attr.nPolys;
 	}
 
 	printf("TOTAL POLY BYTES: %d\n", totalPolyBytes);
 	m_pMeshPolys = new u_long[totalPolyBytes / sizeof(u_long)];
 	Memory::Copy(m_pMeshPolys, pOxmBuf, totalPolyBytes);
+	pOxmBuf += totalPolyBytes / sizeof(u_long);
 
 	printf("TOTAL PRIM BYTES: %d\n", totalPrimBytes);
 	m_pPrims[0] = new u_long[totalPrimBytes / sizeof(u_long)];
@@ -239,6 +246,7 @@ void Mesh::InitPrimBufs()
 	{
 		u_long* pInPoly = m_pMeshPolys;
 		u_long* pOutPrim = m_pPrims[frameBufIdx];
+
 		for (int i = 0; i < m_nAttrs; i++)
 		{
 			MeshAttr& attr = m_pAttrs[i];
@@ -259,6 +267,40 @@ void Mesh::Draw(int frameBufIdx, OrderingTable* pOrderTbl)
 	}
 }
 
+void DrawPolyF3(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_long*& pOut)
+{
+	POLY_F3* pOutPrim = (POLY_F3*)pOut;
+	int inputStrideWords = StrideFromAttribute(attr) / sizeof(u_long);
+    long otz, p, flag, clipVal;
+
+	for (int i = 0; i < attr.nPolys; i++) 
+	{
+		PRIM_TRANSFORM_TRI(1);
+
+		pIn += inputStrideWords; 
+		pOutPrim++;
+	}
+
+	pOut = (u_long*)pOutPrim;
+}
+
+void DrawPolyF4(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_long*& pOut)
+{
+	POLY_F4* pOutPrim = (POLY_F4*)pOut;
+	int inputStrideWords = StrideFromAttribute(attr) / sizeof(u_long);
+    long otz, p, flag, clipVal;
+
+	for (int i = 0; i < attr.nPolys; i++) 
+	{
+		PRIM_TRANSFORM_QUAD(1);
+
+		pIn += inputStrideWords; 
+		pOutPrim++;
+	}
+
+	pOut = (u_long*)pOutPrim;
+}
+
 void DrawPolyG3(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_long*& pOut)
 {
 	POLY_G3* pOutPrim = (POLY_G3*)pOut;
@@ -267,11 +309,58 @@ void DrawPolyG3(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_
 
 	for (int i = 0; i < attr.nPolys; i++) 
 	{
-		SVECTOR* pPositions = (SVECTOR*)(pIn + 3); // Skip the colors 
-		clipVal = RotAverageNclip3(&pPositions[0], &pPositions[1], &pPositions[2],
-			(long*)&pOutPrim->x0, (long*)&pOutPrim->x1, (long*)&pOutPrim->x2,
-			&p, &otz, &flag);
-		if (clipVal >= 0) pOrderTbl->AddPrim(pOutPrim, otz);
+		PRIM_TRANSFORM_TRI(3);
+
+		pIn += inputStrideWords; 
+		pOutPrim++;
+	}
+
+	pOut = (u_long*)pOutPrim;
+}
+
+void DrawPolyG4(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_long*& pOut)
+{
+	POLY_G4* pOutPrim = (POLY_G4*)pOut;
+	int inputStrideWords = StrideFromAttribute(attr) / sizeof(u_long);
+    long otz, p, flag, clipVal;
+
+	for (int i = 0; i < attr.nPolys; i++) 
+	{
+		PRIM_TRANSFORM_QUAD(4);
+
+		pIn += inputStrideWords; 
+		pOutPrim++;
+	}
+
+	pOut = (u_long*)pOutPrim;
+}
+
+void DrawPolyFT3(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_long*& pOut)
+{
+	POLY_FT3* pOutPrim = (POLY_FT3*)pOut;
+	int inputStrideWords = StrideFromAttribute(attr) / sizeof(u_long);
+    long otz, p, flag, clipVal;
+
+	for (int i = 0; i < attr.nPolys; i++) 
+	{
+		PRIM_TRANSFORM_TRI(1);
+
+		pIn += inputStrideWords; 
+		pOutPrim++;
+	}
+
+	pOut = (u_long*)pOutPrim;
+}
+
+void DrawPolyFT4(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_long*& pOut)
+{
+	POLY_FT4* pOutPrim = (POLY_FT4*)pOut;
+	int inputStrideWords = StrideFromAttribute(attr) / sizeof(u_long);
+    long otz, p, flag, clipVal;
+
+	for (int i = 0; i < attr.nPolys; i++) 
+	{
+		PRIM_TRANSFORM_QUAD(1);
 
 		pIn += inputStrideWords; 
 		pOutPrim++;
@@ -288,17 +377,24 @@ void DrawPolyGT3(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u
 
 	for (int i = 0; i < attr.nPolys; i++) 
 	{
-		//printf("0: idx %d, U %hhu, V %hhu\n", i, pOutPrim->u0, pOutPrim->v0);
-		//printf("1: idx %d, U %hhu, V %hhu\n", i, pOutPrim->u1, pOutPrim->v1);
-		//printf("2: idx %d, U %hhu, V %hhu\n", i, pOutPrim->u2, pOutPrim->v2);
-		//printf("idx %d, deref %lu, red %hhu, green %hhu, blue %hhu\n", idx, deref, pPrimOut->r##idx, pPrimOut->g##idx, pPrimOut->b##idx);
-		SVECTOR* pPositions = (SVECTOR*)(pIn + 3); // Skip the colors 
-		clipVal = RotAverageNclip3(&pPositions[0], &pPositions[1], &pPositions[2],
-			(long*)&pOutPrim->x0, (long*)&pOutPrim->x1, (long*)&pOutPrim->x2,
-			&p, &otz, &flag);
-		if (clipVal >= 0) pOrderTbl->AddPrim(pOutPrim, otz);
-		//pt.gt3->clut = pAttr->clutId;
-						//pt.gt3->tpage = pAttr->tpageId;
+		PRIM_TRANSFORM_TRI(3);
+
+		pIn += inputStrideWords; 
+		pOutPrim++;
+	}
+
+	pOut = (u_long*)pOutPrim;
+}
+
+void DrawPolyGT4(const MeshAttr& attr, OrderingTable* pOrderTbl, u_long*& pIn, u_long*& pOut)
+{
+	POLY_GT4* pOutPrim = (POLY_GT4*)pOut;
+	int inputStrideWords = StrideFromAttribute(attr) / sizeof(u_long);
+    long otz, p, flag, clipVal;
+
+	for (int i = 0; i < attr.nPolys; i++) 
+	{
+		PRIM_TRANSFORM_QUAD(4);
 
 		pIn += inputStrideWords; 
 		pOutPrim++;

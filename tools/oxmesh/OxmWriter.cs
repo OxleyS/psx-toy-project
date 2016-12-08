@@ -308,51 +308,86 @@ namespace OxMesh
                 // The polys from each attribute, all concatenated together
                 foreach (Attribute attr in oxmContents.attribTable)
                 {
-                    foreach (Polygon poly in attr.polygons)
-                    {
-                        WriteOxmVertex(poly.v1, attr, true, scaleFactor, writer);
-                        WriteOxmVertex(poly.v2, attr, false, scaleFactor, writer);
-                        WriteOxmVertex(poly.v3, attr, false, scaleFactor, writer);
-                        if (attr.IsQuad()) WriteOxmVertex(poly.v4, attr, false, scaleFactor, writer);
-                    }
+                    foreach (Polygon poly in attr.polygons) WriteOxmPolygon(attr, poly, scaleFactor, writer);
                 }
             }
 
             if (!ProgramArgs.inst.bQuiet) Console.WriteLine("INFO: OXM file successfully written.", scaleFactor);
         }
 
-        private void WriteOxmVertex(Vertex vert, Attribute attr, bool bFirstVert, int scaleFactor, BinaryWriter writer)
+        private void WriteOxmPolygon(Attribute attr, Polygon poly, int scaleFactor, BinaryWriter writer)
         {
-            writer.Write((short)(vert.pos.x * scaleFactor));
-            writer.Write((short)(vert.pos.y * scaleFactor));
-            writer.Write((short)(vert.pos.z * scaleFactor));
-            writer.Write((short)0); // Padding
-
-            // For flat lighting, only write the first normal
-            if (attr.lightType != Attribute.LightingType.None
-                && (bFirstVert || attr.lightType == Attribute.LightingType.Smooth))
+            // Color
+            WriteOxmColor(poly.v1.color, writer);
+            if (attr.IsGouraud())
             {
-                writer.Write(EncodeGteFloat(vert.normal.x));
-                writer.Write(EncodeGteFloat(vert.normal.y));
-                writer.Write(EncodeGteFloat(vert.normal.z));
-                writer.Write((short)0); // Padding
+                WriteOxmColor(poly.v2.color, writer);
+                WriteOxmColor(poly.v3.color, writer);
+                if (attr.IsQuad()) WriteOxmColor(poly.v4.color, writer);
             }
 
-            // For flat coloring, only write the first color
-            if (bFirstVert || attr.IsGouraud())
-            {
-                writer.Write((byte)vert.color.r);
-                writer.Write((byte)vert.color.g);
-                writer.Write((byte)vert.color.b);
-                writer.Write((byte)0); // Padding
-            }
+            // Position
+            WriteOxmPosition(poly.v1.pos, scaleFactor, writer);
+            WriteOxmPosition(poly.v2.pos, scaleFactor, writer);
+            WriteOxmPosition(poly.v3.pos, scaleFactor, writer);
+            if (attr.IsQuad()) WriteOxmPosition(poly.v4.pos, scaleFactor, writer);
 
+            // Tex coords
             if (attr.IsTextured())
             {
-                writer.Write((byte)vert.uv.x);
-                writer.Write((byte)vert.uv.y);
-                writer.Write((short)0); // Padding
+                writer.Write((byte)poly.v1.uv.x);
+                writer.Write((byte)poly.v1.uv.y);
+                writer.Write((byte)poly.v2.uv.x);
+                writer.Write((byte)poly.v2.uv.y);
+                writer.Write((byte)poly.v3.uv.x);
+                writer.Write((byte)poly.v3.uv.y);
+                if (attr.IsQuad())
+                {
+                    writer.Write((byte)poly.v4.uv.x);
+                    writer.Write((byte)poly.v4.uv.y);
+                }
+                else
+                {
+                    writer.Write((byte)0);
+                    writer.Write((byte)0);
+                }
             }
+
+            // Normals
+            if (attr.lightType != Attribute.LightingType.None)
+            {
+                WriteOxmNormal(poly.v1.normal, writer);
+                if (attr.lightType == Attribute.LightingType.Smooth)
+                {
+                    WriteOxmNormal(poly.v2.normal, writer);
+                    WriteOxmNormal(poly.v3.normal, writer);
+                    if (attr.IsQuad()) WriteOxmNormal(poly.v4.normal, writer);
+                }
+            }
+        }
+
+        private void WriteOxmColor(RgbColor color, BinaryWriter writer)
+        {
+            writer.Write((byte)color.r);
+            writer.Write((byte)color.g);
+            writer.Write((byte)color.b);
+            writer.Write((byte)0); // Padding
+        }
+
+        private void WriteOxmPosition(Vector3 pos, int scaleFactor, BinaryWriter writer)
+        {
+            writer.Write((short)(pos.x * scaleFactor));
+            writer.Write((short)(pos.y * scaleFactor));
+            writer.Write((short)(pos.z * scaleFactor));
+            writer.Write((short)0); // Padding
+        }
+
+        private void WriteOxmNormal(Vector3 normal, BinaryWriter writer)
+        {
+            writer.Write(EncodeGteFloat(normal.x));
+            writer.Write(EncodeGteFloat(normal.y));
+            writer.Write(EncodeGteFloat(normal.z));
+            writer.Write((short)0); // Padding
         }
 
         // 1 sign bit, 3 whole bits, 12 fractional bits
