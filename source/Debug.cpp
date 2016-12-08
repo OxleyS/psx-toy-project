@@ -104,4 +104,11 @@ namespace Debug
 		printf("CLUT: %hu, TPage: %hu\n", pPoly->clut, pPoly->tpage);
 		PrintFooter();
 	}
+
+	void PrintColor(const CVECTOR* pColor, const char* pName)
+	{
+		PrintHeaderToName("COLOR", pName);
+		printf(": %hhu, %hhu, %hhu\n", pColor->r, pColor->g, pColor->b);
+		PrintFooter();
+	}
 }

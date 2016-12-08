@@ -6,6 +6,11 @@
 
 struct MeshAttr
 {
+	enum Flag
+	{
+		MESHATTR_DOUBLESIDED = 1
+	};
+
 	u_short nPolys;
 
 	u_char polyType; // MeshPoly::Type
@@ -24,7 +29,7 @@ class Mesh
 	Mesh();
 	~Mesh();
 
-	void InitFromLoadedOxm(u_long* pOxmBuf);
+	void InitFromLoadedOxm(u_long* pOxmBuf, int nBytes);
 
 	void InitPrimBufs();
 	void AllocateBuffers(int nMeshPolyWords, int nPrimWords, int nAttrs);

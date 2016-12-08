@@ -41,6 +41,7 @@ namespace Debug
     void PrintSvector(const SVECTOR* pVec, const char* pName);
     void PrintOt(const OrderingTable* pOt, const char* pName);
     void PrintPolyGT3(const POLY_GT3* pPoly, const char* pName);
+    void PrintColor(const CVECTOR* pColor, const char* pName);
 }
 
 #endif
