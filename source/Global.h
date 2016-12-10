@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include <libgte.h>
 #include <libgpu.h>
@@ -21,11 +22,25 @@
 // Custom replacements of the crappy ones provided by the BIOS
 namespace Memory
 {
+    void* Move(void* pDest, const void* pSrc, int nBytes);
     void* Copy(void* pDest, const void* pSrc, int nBytes);
     void* Set(void* pDest, int value, int nBytes);
 }
+namespace String
+{
+    int Compare(const char* pStr1, const char* pStr2);
+    int Length(const char* pStr);
+    int Copy(char* pDest, const char* pSource);
+    char* NewDup(const char* pStr); // Uses new instead of malloc
+}
+
+class Color : public CVECTOR
+{
+};
 
 class OrderingTable;
+class Vec3Short;
+class Matrix;
 namespace Debug
 {
     void PrintHeaderToName(const char* pType, const char* pName);
@@ -37,11 +52,11 @@ namespace Debug
     void PrintUshortHex(u_short val, const char* pName);
     void PrintUlong(u_long val, const char* pName);
     void PrintUlongHex(u_long val, const char* pName);
-    void PrintMatrix(const MATRIX* pMtx, const char* pName);
-    void PrintSvector(const SVECTOR* pVec, const char* pName);
+    void PrintMatrix(const Matrix* pMtx, const char* pName);
+    void PrintVec3Short(const Vec3Short* pVec, const char* pName);
     void PrintOt(const OrderingTable* pOt, const char* pName);
     void PrintPolyGT3(const POLY_GT3* pPoly, const char* pName);
-    void PrintColor(const CVECTOR* pColor, const char* pName);
+    void PrintColor(const Color* pColor, const char* pName);
 }
 
 #endif

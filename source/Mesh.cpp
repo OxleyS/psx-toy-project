@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include "Math.h"
 #include "OrderingTable.h"
 #include "MeshPrimMacros.h"
 
@@ -145,7 +146,6 @@ void Mesh::FreeBuffers()
 
 void Mesh::InitFromLoadedOxm(u_long* pOxmBuf, int nBytes)
 {
-	u_char* pBufStart = (u_char*)pOxmBuf;
 	u_char* pByteBuf;
 
 	printf("PARSING OXM BUFFER\n");

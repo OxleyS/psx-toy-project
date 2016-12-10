@@ -2,11 +2,10 @@
 #define _CHECKERBOARD_H_
 
 #include "Global.h"
+#include "Texture.h"
 
-extern u_long g_CheckerboardRgb[];
-extern int g_CheckerboardWidth; // Texels
-extern int g_CheckerboardHeight; // Texels
+extern Texture g_CheckerboardTex;
 
-void Checkerboard_Initialize();
+void InitializeCheckboardTexture();
 
 #endif

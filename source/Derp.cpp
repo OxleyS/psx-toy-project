@@ -1,8 +1,9 @@
 #include "Global.h"
 
 #include <libetc.h>
-#include <stdio.h>
 #include <libds.h>
+#include <stdio.h>
+#include <libapi.h>
 
 #include "Math.h"
 #include "FrameBuffer.h"
@@ -89,8 +90,6 @@ int main(void)
 
 void Initialize(void)
 {
-	u_short tpage;
-
 	// 1 MB of heap space
 	InitHeap3((unsigned long*)0x800F8000, 0x00100000);
 
@@ -128,18 +127,18 @@ void Initialize(void)
 
 	pCamera = new Camera;
 
-	Checkerboard_Initialize();
-	tpage = LoadTPage(g_CheckerboardRgb, 2, 0, 384, 0, g_CheckerboardWidth, g_CheckerboardHeight);
+	InitializeCheckboardTexture();
+	Texture& tex = g_CheckerboardTex;
 	pChecker = new Mesh;
 	pChecker->AllocateBuffers(sizeof(MeshTriGourTex) / 2, sizeof(POLY_GT3) / 2, 1);
 	Memory::Copy(pChecker->m_pMeshPolys, plane, sizeof(MeshTriGourTex) * 2);
 	pChecker->m_pAttrs[0].nPolys = 2;
 	pChecker->m_pAttrs[0].polyType = MeshPoly::MESHPT_TRI_GOUR_TEX;
 	pChecker->m_pAttrs[0].lightType = MeshPoly::MESHPL_NONE;
-	pChecker->m_pAttrs[0].semitransparentCode = 0xFF;
+	pChecker->m_pAttrs[0].semitransparentCode = (u_char)tex.m_SemiTransCode;
 	pChecker->m_pAttrs[0].flags = 0;
-	pChecker->m_pAttrs[0].clutId = tpage;	
-	pChecker->m_pAttrs[0].tpageId = tpage;
+	pChecker->m_pAttrs[0].clutId = tex.m_ClutId;
+	pChecker->m_pAttrs[0].tpageId = tex.m_TpageId;
 	pChecker->InitPrimBufs();
 
 	DrawSync(0);
@@ -207,9 +206,15 @@ void SwapBuffers(void)
 	ClearImage(&g_pCurFrameBuf->m_DrawEnv.clip, 25, 25, 25);
 }
 
-void* operator new(std::size_t n) throw(std::bad_alloc)
+void* operator new(std::size_t n)
 {
-  	return malloc3(n);
+	void* pMem = malloc3(n);
+	if (!pMem)
+	{
+		printf("FATAL: OUT OF MEMORY (%u)\n", n);
+		SystemError('m', 69);
+	}
+  	return pMem;
 }
 
 void operator delete(void* p) throw()

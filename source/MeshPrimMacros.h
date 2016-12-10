@@ -33,7 +33,7 @@ pOutPrim->v##idx = pByte[(idx * 2) + 1];
 pOutPrim->tpage = attr.tpageId;
 
 #define PRIM_TRANSFORM_TRI(posWordOffset) \
-SVECTOR* pPositions = (SVECTOR*)(pIn + posWordOffset); \
+Vec3Short* pPositions = (Vec3Short*)(pIn + posWordOffset); \
 if (attr.flags & MeshAttr::MESHATTR_DOUBLESIDED) \
 { \
     otz = RotAverage3(&pPositions[0], &pPositions[1], &pPositions[2], \
@@ -50,7 +50,7 @@ else \
 }
 
 #define PRIM_TRANSFORM_QUAD(posWordOffset) \
-SVECTOR* pPositions = (SVECTOR*)(pIn + posWordOffset); \
+Vec3Short* pPositions = (Vec3Short*)(pIn + posWordOffset); \
 if (attr.flags & MeshAttr::MESHATTR_DOUBLESIDED) \
 { \
     otz = RotAverage4(&pPositions[0], &pPositions[1], &pPositions[2], &pPositions[3], \
