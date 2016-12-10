@@ -6,6 +6,6 @@
 
 extern Texture g_CheckerboardTex;
 
-void InitializeCheckboardTexture();
+void InitializeCheckboardTexture(int texX, int texY, int clutX, int clutY);
 
 #endif

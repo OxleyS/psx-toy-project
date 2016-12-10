@@ -17,6 +17,9 @@ class Texture
         void InitFromLoadedTim(u_long* pLoadedTim, int nBytes);
         void InitFromMemoryColor(SemitransparentCode semiTransCode,
             u_long* pTexels, int texelWidth, int texelHeight, int vramX, int vramY);
+        void InitFromMemoryClut(SemitransparentCode semiTransCode,
+            u_long* pTexels, int texelWidth, int texelHeight, int vramX, int vramY,
+            Type clutType, u_long* pClut, int clutX, int clutY);
 
         Type m_Type;
         SemitransparentCode m_SemiTransCode;

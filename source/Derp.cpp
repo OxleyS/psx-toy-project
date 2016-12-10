@@ -127,7 +127,7 @@ void Initialize(void)
 
 	pCamera = new Camera;
 
-	InitializeCheckboardTexture();
+	InitializeCheckboardTexture(384, 0, 448, 0);
 	Texture& tex = g_CheckerboardTex;
 	pChecker = new Mesh;
 	pChecker->AllocateBuffers(sizeof(MeshTriGourTex) / 2, sizeof(POLY_GT3) / 2, 1);
