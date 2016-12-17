@@ -2,6 +2,7 @@
 #define _RESOURCES_H_
 
 #define MAX_LOADED_MESHES 16
+#define MAX_LOADED_TEXTURES 64
 #define MAX_PATH_SIZE 50
 
 #include "Global.h"
@@ -28,7 +29,7 @@ class Resources
 
     private:
 
-        enum ResourceType { RT_MESH };
+        enum ResourceType { RT_MESH, RT_TEXTURE };
 
         struct Resource
         {
@@ -37,10 +38,14 @@ class Resources
             int nRemainingSectors;
         };
 
+        static void* GetResourceByName(Resource* pResArray, int nRes, const char* pName);
+        static void* RemoveResourceByName(Resource* pResArray, int& nRes, const char* pName);
         static void BeginResourceLoad(const char* pFilePath);
 
         static Resource m_sMeshes[MAX_LOADED_MESHES];
         static int m_snMeshes;
+        static Resource m_sTextures[MAX_LOADED_TEXTURES];
+        static int m_snTextures;
 
         static Resource* m_spLoadingResource;
         static ResourceType m_sLoadingResourceType;

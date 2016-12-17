@@ -28,10 +28,11 @@ namespace Memory
 }
 namespace String
 {
-    int Compare(const char* pStr1, const char* pStr2);
-    int Length(const char* pStr);
-    int Copy(char* pDest, const char* pSource);
-    char* NewDup(const char* pStr); // Uses new instead of malloc
+    int Compare(const char* pStr1, const char* pStr2); // strcmp
+    int Length(const char* pStr); // strlen
+    int Copy(char* pDest, const char* pSource); // strcpy
+    int CopyCount(char* pDest, const char* pSource, int count); // strncpy 
+    char* NewDup(const char* pStr); // strdup, but uses new instead of malloc
 }
 
 class Color : public CVECTOR

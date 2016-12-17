@@ -282,7 +282,7 @@ namespace OxMesh
                 }
 
                 // Pad to 32-bit boundary
-                for (int i = 0; i < 4 - (nUnpadded % 4); i++) writer.Write((byte)0);
+                for (int i = 0; i < (4 - (nUnpadded % 4)) % 4; i++) writer.Write((byte)0);
 
                 // Attribute table (minus the polygons)
                 writer.Write(oxmContents.attribTable.Count);

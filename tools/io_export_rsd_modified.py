@@ -1,6 +1,5 @@
 #  PlayStation RSD export plug-in v1.00
 #  Written by Lameguy64/TheCodingBrony of Meido-Tek Productions.
-#  Any modifications from the original written by Sean Oxley
 #
 #  Notes:
 #   - All polygons of the model must only be triangles (3 point polygons) or
@@ -205,7 +204,8 @@ class ExportRSD(bpy.types.Operator, ExportHelper):
                 if uv.image is not None:
                     
                     addTex = True
-                    tex_fileName = bpy.path.ensure_ext(bpy.path.basename(uv.image.filepath), '.tim')
+                    tex_baseNoExtName = bpy.path.basename(uv.image.filepath).rsplit('.')[0]
+                    tex_fileName = bpy.path.ensure_ext(tex_baseNoExtName, '.tim')
                     
                     if len(tex_list)>0:
                         for c,t in enumerate(tex_list):

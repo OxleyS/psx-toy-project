@@ -6,7 +6,7 @@ set SOURCEDIR=source
 set DISTDIR=dist
 set MMGMOBJDIR=C:\psyq\beta\mmgm\OBJ
 set LIBDIR=C:\psyq\lib
-set MKPSXISODIR=..\mkpsxiso\prebuilt
+set MKPSXISODIR=..\mkpsxiso_old
 
 echo Clearing out previous build files...
 del /Q %BUILDDIR%\*
@@ -21,7 +21,7 @@ echo Building final EXE...
 cpe2x %BUILDDIR%\main.cpe
 
 echo Building CD-ROM image...
-%MKPSXISODIR%\mkpsxiso -y cdbuild\derp.xml
+%MKPSXISODIR%\prebuilt\mkpsxiso -y cdbuild\derp.xml
 
 echo Build finished.
 
