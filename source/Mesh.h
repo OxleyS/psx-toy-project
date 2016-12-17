@@ -32,6 +32,7 @@ class Mesh
 	void InitFromLoadedOxm(u_long* pOxmBuf, int nBytes);
 
 	void InitPrimBufs();
+
 	void AllocateBuffers(int nMeshPolyWords, int nPrimWords, int nAttrs);
 	void Draw(int frameBufIdx, OrderingTable* pOrderTbl);
 	void FreeBuffers();	

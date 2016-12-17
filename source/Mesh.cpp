@@ -2,6 +2,8 @@
 #include "Math.h"
 #include "OrderingTable.h"
 #include "MeshPrimMacros.h"
+#include "Texture.h"
+#include "Resources.h"
 
 int g_BasePolySizeTable[] =
 {
@@ -159,12 +161,20 @@ void Mesh::InitFromLoadedOxm(u_long* pOxmBuf, int nBytes)
 	// Texture table
 	pByteBuf = (u_char*)pOxmBuf;
 	int nTextures = *pByteBuf++;
+	char** ppTexturePaths = new char*[nTextures];
 	for (int i = 0; i < nTextures; i++)
 	{
 		int nChars = *pByteBuf++;
-		printf("TEXTURE %d: %.*s\n", i, nChars, pByteBuf);
+
+		char* pTexPath = new char[nChars + 1];
+		//String::CopyCount(pTexPath, (char*)pByteBuf, nChars);
+		String::CopyCount(pTexPath, "MOE256.TIM", nChars);
+		pTexPath[nChars] = '\0';
+		printf("TEXTURE %d: %s\n", i, pTexPath);
+		ppTexturePaths[i] = pTexPath;
+
 		pByteBuf += nChars;
-	} 
+	}
 
 	// Start at next 32-bit boundary
 	pByteBuf = (u_char*)(((u_long)pByteBuf + 3) & ~3);
@@ -174,6 +184,7 @@ void Mesh::InitFromLoadedOxm(u_long* pOxmBuf, int nBytes)
 	m_nAttrs = (int)*pOxmBuf++;
 	m_pAttrs = new MeshAttr[m_nAttrs];
 	printf("ATTR TABLE (%d entries):\n", m_nAttrs);
+	u_char* pTexIndices = new u_char[m_nAttrs];
 
 	// Attribute table
 	for (int i = 0; i < m_nAttrs; i++)
@@ -193,9 +204,8 @@ void Mesh::InitFromLoadedOxm(u_long* pOxmBuf, int nBytes)
 		printf("\t\tLight code %hhu\n", attr.lightType);
 		printf("\t\tST code %hhu\n", attr.semitransparentCode);
 		
-		u_char texTableIdx = *pByteBuf++;
-		printf("\t\tTex table idx %hhu\n", texTableIdx);
-		// TODO: Resolve the associated CLUT and TPAGE ID
+		pTexIndices[i] = *pByteBuf++;
+		printf("\t\tTex table idx %hhu\n", pTexIndices[i]);
 
 		attr.flags = *pByteBuf++;
 		printf("\t\tFlags %hhu\n", attr.flags);
@@ -225,6 +235,32 @@ void Mesh::InitFromLoadedOxm(u_long* pOxmBuf, int nBytes)
 	printf("TOTAL PRIM BYTES: %d\n", totalPrimBytes);
 	m_pPrims[0] = new u_long[totalPrimBytes / sizeof(u_long)];
 	m_pPrims[1] = new u_long[totalPrimBytes / sizeof(u_long)];
+
+	// Now that we don't need the load buffer anymore, we can resolve textures
+	// TODO: Come up with something better. This does not
+	// support asynchronous loading
+	for (int i = 0; i < m_nAttrs; i++)
+	{
+		MeshAttr& attr = m_pAttrs[i];
+		u_char texTableIdx = pTexIndices[i];
+		if (texTableIdx != 0xFF)
+		{
+			Texture* pTex = Resources::GetLoadedTexture(ppTexturePaths[texTableIdx]);
+			if (!pTex) pTex = Resources::BlockingTextureLoad(ppTexturePaths[texTableIdx]);
+
+			attr.tpageId = pTex->m_TpageId;
+			attr.clutId = pTex->m_ClutId;
+		}
+		else
+		{
+			attr.tpageId = 0xFFFF;
+			attr.clutId = 0xFFFF;
+		}
+	}
+
+	delete[] pTexIndices;
+	for (int i = 0; i < nTextures; i++) delete[] ppTexturePaths[i];
+	delete[] ppTexturePaths;
 
 	printf("LOAD COMPLETE. INITIALIZING\n");
 	InitPrimBufs();

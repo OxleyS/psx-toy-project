@@ -4,7 +4,6 @@ Texture g_CheckerboardTex;
 
 void InitializeCheckboardTexture(int texX, int texY, int clutX, int clutY)
 {
-    //int colors[] = { 0x001F001F, 0x03E003E0, 0x7C007C00 };
     int colors[] = { 0x00000000, 0x11111111, 0x22222222 };
     int nColors = sizeof(colors) / sizeof(int);
     int colorIdx;
@@ -25,11 +24,8 @@ void InitializeCheckboardTexture(int texX, int texY, int clutX, int clutY)
             if (horIdx % (8 / texelsPerLong) == 0) colorIdx = (colorIdx + 1) % nColors;
         }
         verIdx++;
-        if (verIdx % 4 == 0) startIdx = (startIdx + 1) % nColors; // Black to white, white to black
+        if (verIdx % 4 == 0) startIdx = (startIdx + 1) % nColors;
     }
-
-    //g_CheckerboardTex.InitFromMemoryColor(Texture::SEMITRANS_DONTCARE,
-            //pRgb, texelWidth, texelHeight, texX, texY);
 
     u_long clut[] = { 0x03E0001F, 0xFFFF7C00, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };  
     g_CheckerboardTex.InitFromMemoryClut(Texture::SEMITRANS_DONTCARE,

@@ -95,6 +95,13 @@ namespace String
         return (int)(pDest - pDestStart - 1);
     }
 
+    int CopyCount(char* pDest, const char* pSrc, int count)
+    {
+        const char* pDestStart = pDest;
+        while (count > 0) { *pDest++ = *pSrc++; count--; }
+        return (int)(pDest - pDestStart - 1);
+    }
+
     char* NewDup(const char* pStr)
     {
         char* pCopy = new char[Length(pStr) + 1];
