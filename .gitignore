@@ -2,3 +2,5 @@ build/
 dist/
 asset/test*
 asset/moe*
+tools/timtool3b
+tools/timutil
