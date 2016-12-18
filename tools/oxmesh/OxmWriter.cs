@@ -277,7 +277,7 @@ namespace OxMesh
                 {
                     // We write out strings manually to be more compact
                     writer.Write((byte)texName.Length);
-                    writer.Write(texName.ToCharArray());
+                    writer.Write(texName.ToUpper().ToCharArray());
                     nUnpadded += texName.Length + 1;
                 }
 

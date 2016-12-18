@@ -167,8 +167,7 @@ void Mesh::InitFromLoadedOxm(u_long* pOxmBuf, int nBytes)
 		int nChars = *pByteBuf++;
 
 		char* pTexPath = new char[nChars + 1];
-		//String::CopyCount(pTexPath, (char*)pByteBuf, nChars);
-		String::CopyCount(pTexPath, "MOE256.TIM", nChars);
+		String::CopyCount(pTexPath, (char*)pByteBuf, nChars);
 		pTexPath[nChars] = '\0';
 		printf("TEXTURE %d: %s\n", i, pTexPath);
 		ppTexturePaths[i] = pTexPath;
