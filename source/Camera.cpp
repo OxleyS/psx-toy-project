@@ -7,7 +7,7 @@ Camera::Camera()
     m_Roll = 0;
     m_CameraMtx = Matrix::Identity; 
     m_Position = Vec3Short::Zero;
-    m_bDirty = 0;
+    m_bDirty = false;
 }
 
 void Camera::ClampRotations()
@@ -18,7 +18,7 @@ void Camera::ClampRotations()
     if (m_Pitch > 4096) m_Pitch -= 4096;
     if (m_Roll < 0) m_Roll += 4096;
     if (m_Roll > 4096) m_Roll -= 4096;
-    m_bDirty = 1;
+    m_bDirty = true;
 }
 
 Matrix* Camera::GetCameraMatrix() 
@@ -36,7 +36,7 @@ Matrix* Camera::GetCameraMatrix()
         m_CameraMtx.t[1] = -(((const Vec3Short&)m_CameraMtx.m[1][0]).Dot(m_Position) >> 12);
         m_CameraMtx.t[2] = -(((const Vec3Short&)m_CameraMtx.m[2][0]).Dot(m_Position) >> 12);
 
-        m_bDirty = 0;
+        m_bDirty = false;
     }
 
     return &m_CameraMtx;

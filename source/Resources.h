@@ -3,7 +3,7 @@
 
 #define MAX_LOADED_MESHES 16
 #define MAX_LOADED_TEXTURES 64
-#define MAX_PATH_SIZE 50
+#define MAX_PATH_SIZE 100
 
 #include "Global.h"
 

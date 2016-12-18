@@ -19,7 +19,7 @@ struct Camera : GameObject
     short m_Roll;
     Matrix m_CameraMtx;
     Vec3Short m_Position;
-    u_char m_bDirty;
+    bool m_bDirty;
 };
 
 #endif

@@ -11,7 +11,7 @@
 
 #define FORCE_INLINE __attribute__((always_inline))
 
-#define OT_LENGTH (256)
+#define OT_LENGTH (512)
 
 #define SCREEN_WIDTH (320)
 #define SCREEN_HEIGHT (240)
