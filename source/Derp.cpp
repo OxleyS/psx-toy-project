@@ -33,9 +33,10 @@ enum VideoMode
 };
 static VideoMode g_VideoMode;
 
-Mesh* pChecker;
+//Mesh* pChecker;
 Camera* pCamera;
 GameObject* pGameObject;
+GameObject* pLevelObj;
 
 struct MeshTriGourTex
 {
@@ -126,8 +127,10 @@ void Initialize(void)
 	}
 
 	pCamera = new Camera;
+	pCamera->m_Position.vy = -50;
+	pCamera->m_bDirty = true;
 
-	InitializeCheckboardTexture(384, 0, 448, 0);
+	/*InitializeCheckboardTexture(384, 0, 448, 0);
 	Texture& tex = g_CheckerboardTex;
 	pChecker = new Mesh;
 	pChecker->AllocateBuffers(sizeof(MeshTriGourTex) / 2, sizeof(POLY_GT3) / 2, 1);
@@ -139,7 +142,7 @@ void Initialize(void)
 	pChecker->m_pAttrs[0].flags = 0;
 	pChecker->m_pAttrs[0].clutId = tex.m_ClutId;
 	pChecker->m_pAttrs[0].tpageId = tex.m_TpageId;
-	pChecker->InitPrimBufs();
+	pChecker->InitPrimBufs();*/
 
 	DrawSync(0);
 	VSync(0);
@@ -147,6 +150,9 @@ void Initialize(void)
 
 	pGameObject = new TestObject;
 	pGameObject->m_pGCRender->m_WorldMtx.t[2] = 500;
+
+	pLevelObj = new TestObject("TESTLVL.OXM");
+	pLevelObj->m_pGCRender->m_WorldMtx.t[2] = 500;
 }
 
 void Update(void)
@@ -180,15 +186,14 @@ void BuildDrawCommands(void)
 	renderData.pFrameBuf = g_pCurFrameBuf;
 
 	pGameObject->Draw(&renderData);
+	pLevelObj->Draw(&renderData);
 
 	mtx = Matrix::Identity;
 	mtx.t[2] = 500;
-	
 	mtx.MulInPlace(*pCameraMtx);
-
 	SetRotMatrix(&mtx);
 	SetTransMatrix(&mtx);
-	pChecker->Draw(g_CurFrameBufIdx, &g_pCurFrameBuf->m_Ot);
+	//pChecker->Draw(g_CurFrameBufIdx, &g_pCurFrameBuf->m_Ot);
 }
 
 void IssueDraw(void)

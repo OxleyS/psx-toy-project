@@ -34,11 +34,13 @@
 
 			<dir name="asset">
 				<dir name="oxm">				
-					<file name="test.oxm" type="data" source="asset\test.oxm"/>			
+					<file name="test.oxm" type="data" source="asset\test.oxm"/>
+					<file name="testlvl.oxm" type="data" source="asset\testlvl.oxm"/>
 				</dir>
 
 				<dir name="tex">
 					<file name="moe256.tim" type="data" source="asset\moe256.tim"/>
+					<file name="dirt.tim" type="data" source="asset\dirt.tim"/>
 				</dir>
 				
 				<dummy sectors="1024"/>
