@@ -46,7 +46,7 @@ else \
     clipVal = RotAverageNclip3(&pPositions[0], &pPositions[1], &pPositions[2], \
         (long*)&pOutPrim->x0, (long*)&pOutPrim->x1, (long*)&pOutPrim->x2, \
         &p, &otz, &flag); \
-    if (clipVal >= 0) pOrderTbl->AddPrim(pOutPrim, otz); \
+    if (clipVal > 0) pOrderTbl->AddPrim(pOutPrim, otz); \
 }
 
 #define PRIM_TRANSFORM_QUAD(posWordOffset) \
@@ -63,7 +63,7 @@ else \
     clipVal = RotAverageNclip4(&pPositions[0], &pPositions[1], &pPositions[2], &pPositions[3], \
         (long*)&pOutPrim->x0, (long*)&pOutPrim->x1, (long*)&pOutPrim->x2, (long*)&pOutPrim->x3, \
         &p, &otz, &flag); \
-    if (clipVal >= 0) pOrderTbl->AddPrim(pOutPrim, otz); \
+    if (clipVal > 0) pOrderTbl->AddPrim(pOutPrim, otz); \
 }
 
 #endif

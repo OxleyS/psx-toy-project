@@ -56,7 +56,9 @@ namespace Debug
     void PrintMatrix(const Matrix* pMtx, const char* pName);
     void PrintVec3Short(const Vec3Short* pVec, const char* pName);
     void PrintOt(const OrderingTable* pOt, const char* pName);
+    void PrintPolyG4(const POLY_G4* pPoly, const char* pName);
     void PrintPolyGT3(const POLY_GT3* pPoly, const char* pName);
+    void PrintPolyGT4(const POLY_GT4* pPoly, const char* pName);
     void PrintColor(const Color* pColor, const char* pName);
 }
 
