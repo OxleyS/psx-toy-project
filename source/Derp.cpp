@@ -115,7 +115,7 @@ void Initialize(void)
 	SetDispMask(1);
 
 	g_FrameBuffers[0].Initialize(0, 0);
-	g_FrameBuffers[1].Initialize(0, SCREEN_HEIGHT);
+	g_FrameBuffers[1].Initialize(0, 256);
 
 	for (int i = 0; i < 2; i++)
 	{
