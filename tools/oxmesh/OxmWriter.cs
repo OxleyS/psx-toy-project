@@ -110,6 +110,8 @@ namespace OxMesh
             public int scaleFactor = 1;
             public List<string> textureNames = new List<string>();
             public List<Attribute> attribTable = new List<Attribute>();
+            public Vector3 aabbMin;
+            public Vector3 aabbMax;
         }
 
         private OxmContents ConstructOxm()
@@ -212,12 +214,40 @@ namespace OxMesh
                     if (bQuad) oxmPoly.v4.uv = mat.vertUvs[3];
                 }
 
+             
                 attr.polygons.Add(oxmPoly);
             }
 
-            int nPolys = 0;
-            foreach (Attribute attr in oxm.attribTable) nPolys += attr.polygons.Count;
-            if (!ProgramArgs.inst.bQuiet) Console.WriteLine("INFO: OXM data constructed: {0} polygons, over {1} attributes.", nPolys, oxm.attribTable.Count);
+            // Min/max bounds
+            Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            Vector3 max = new Vector3(-float.MaxValue, -float.MaxValue, -float.MaxValue);
+            foreach (Attribute attr in oxm.attribTable)
+            {
+                foreach (Polygon poly in attr.polygons)
+                {
+                    Vertex[] verts = new Vertex[] { poly.v1, poly.v2, poly.v3, poly.v4 };
+                    for (int i = 0; i < (attr.IsQuad() ? 4 : 3); i++)
+                    {
+                        Vertex vert = verts[i];
+                        min.x = Math.Min(min.x, vert.pos.x);
+                        min.y = Math.Min(min.y, vert.pos.y);
+                        min.z = Math.Min(min.z, vert.pos.z);
+                        max.x = Math.Max(max.x, vert.pos.x);
+                        max.y = Math.Max(max.y, vert.pos.y);
+                        max.z = Math.Max(max.z, vert.pos.z);
+                    }
+                }
+            }
+            oxm.aabbMin = min;
+            oxm.aabbMax = max;
+
+            if (!ProgramArgs.inst.bQuiet)
+            {
+                int nPolys = 0;
+                foreach (Attribute attr in oxm.attribTable) nPolys += attr.polygons.Count;
+                Console.WriteLine("INFO: OXM data constructed: {0} polygons, over {1} attributes.", nPolys, oxm.attribTable.Count);
+                Console.WriteLine("INFO: Unscaled AABB: [{0}, {1}, {2}] -> [{3}, {4}, {5}]", min.x, min.y, min.z, max.x, max.y, max.z);
+            }
 
             return oxm;
         }
@@ -259,7 +289,22 @@ namespace OxMesh
             int version = 1;
             int scaleFactor = oxmContents.scaleFactor;
 
-            if (!ProgramArgs.inst.bQuiet) Console.WriteLine("INFO: Writing OXM file with scale factor {0}.", scaleFactor);
+            if (!ProgramArgs.inst.bQuiet)
+            {
+                Console.WriteLine("INFO: Writing OXM file with scale factor {0}.", scaleFactor);
+
+                Vector3 min = oxmContents.aabbMin;
+                Vector3 max = oxmContents.aabbMax;
+                min.x = (float)((short)(min.x * scaleFactor));
+                min.y = (float)((short)(min.y * scaleFactor));
+                min.z = (float)((short)(min.z * scaleFactor));
+                max.x = (float)((short)(max.x * scaleFactor));
+                max.y = (float)((short)(max.y * scaleFactor));
+                max.z = (float)((short)(max.z * scaleFactor));
+                Console.WriteLine("INFO: Scaled AABB: [{0}, {1}, {2}] -> [{3}, {4}, {5}]", min.x, min.y, min.z, max.x, max.y, max.z);
+            }
+
+            
 
             // BinaryWriter's docs says it uses little-endian, so we
             // don't have to do anything special for that

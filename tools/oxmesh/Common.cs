@@ -32,12 +32,25 @@ namespace OxMesh
 
     struct Vector2
     {
+        public Vector2(float x, float y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+
         public float x;
         public float y;
     }
 
     struct Vector3
     {
+        public Vector3(float x, float y, float z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
         public float x;
         public float y;
         public float z;
