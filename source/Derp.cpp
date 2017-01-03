@@ -147,10 +147,29 @@ void Update(void)
 	Input::ControllerType controllerType = Input::GetControllerType(0);
 	if (controllerType != Input::CONTROLLER_NONE)
 	{
-		if (Input::ButtonDown(Input::BUTTON_DLEFT, 0)) pCamera->m_Yaw -= 10;
-		if (Input::ButtonDown(Input::BUTTON_DRIGHT, 0)) pCamera->m_Yaw += 10;
-		if (Input::ButtonDown(Input::BUTTON_DUP, 0)) pCamera->m_Pitch += 10;
-		if (Input::ButtonDown(Input::BUTTON_DDOWN, 0)) pCamera->m_Pitch -= 10;
+		int xMove = 0, zMove = 0;
+		static const int moveScalar = 10;
+
+		if (Input::ButtonDown(Input::BUTTON_DLEFT, 0)) xMove -= moveScalar;
+		if (Input::ButtonDown(Input::BUTTON_DRIGHT, 0)) xMove += moveScalar;
+		if (Input::ButtonDown(Input::BUTTON_DUP, 0)) zMove += moveScalar;
+		if (Input::ButtonDown(Input::BUTTON_DDOWN, 0)) zMove -= moveScalar;
+
+		Matrix* pMtx = pCamera->GetCameraMatrix();
+		Vec3Long offset;
+		offset.vx = (pMtx->m[0][0] * xMove) >> 12;
+		offset.vy = (pMtx->m[0][1] * xMove) >> 12;
+		offset.vz = (pMtx->m[0][2] * xMove) >> 12;
+		offset.vx += (pMtx->m[2][0] * zMove) >> 12;
+		offset.vy += (pMtx->m[2][1] * zMove) >> 12;
+		offset.vz += (pMtx->m[2][2] * zMove) >> 12;
+		pCamera->m_Position += offset;
+		pCamera->m_bDirty = true;
+
+		if (Input::ButtonDown(Input::BUTTON_SQ, 0)) pCamera->m_Yaw -= 10;
+		if (Input::ButtonDown(Input::BUTTON_O, 0)) pCamera->m_Yaw += 10;
+		if (Input::ButtonDown(Input::BUTTON_TRI, 0)) pCamera->m_Pitch += 10;
+		if (Input::ButtonDown(Input::BUTTON_X, 0)) pCamera->m_Pitch -= 10;
 	}
 	pCamera->ClampRotations();
 }

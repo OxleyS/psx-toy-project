@@ -41,6 +41,7 @@ class Color : public CVECTOR
 
 class OrderingTable;
 class Vec3Short;
+class Vec3Long;
 class Matrix;
 namespace Debug
 {
@@ -55,6 +56,7 @@ namespace Debug
     void PrintUlongHex(u_long val, const char* pName);
     void PrintMatrix(const Matrix* pMtx, const char* pName);
     void PrintVec3Short(const Vec3Short* pVec, const char* pName);
+    void PrintVec3Long(const Vec3Long* pVec, const char* pName);
     void PrintOt(const OrderingTable* pOt, const char* pName);
     void PrintPolyG4(const POLY_G4* pPoly, const char* pName);
     void PrintPolyGT3(const POLY_GT3* pPoly, const char* pName);

@@ -28,6 +28,7 @@ class Vec3Short : public SVECTOR
         Vec3Short& operator-=(const Vec3Short& rhs) { vx -= rhs.vx; vy -= rhs.vy; vz -= rhs.vz; return *this; }
         Vec3Short operator*(short scalar) const { return Vec3Short(vx * scalar, vy * scalar, vz * scalar); }
         Vec3Short& operator*=(short scalar) { vx *= scalar; vy *= scalar; vz *= scalar; return *this; }
+        Vec3Short operator-() const { return Vec3Short(-vx, -vy, -vz); }
 };
 
 class Vec3Long : public VECTOR
@@ -37,6 +38,17 @@ class Vec3Long : public VECTOR
         Vec3Long(long x, long y, long z) { vx = x; vy = y; vz = z; }
 
         inline static Vec3Long FromShort(const Vec3Short& shortVec);
+
+        static const Vec3Long& Zero;
+
+        Vec3Long& operator=(const Vec3Long& rhs) { vx = rhs.vx; vy = rhs.vy; vz = rhs.vz; return *this; }
+        Vec3Long operator+(const Vec3Long& rhs) const { return Vec3Long(vx + rhs.vx, vy + rhs.vy, vz + rhs.vz); }
+        Vec3Long& operator+=(const Vec3Long& rhs) { vx += rhs.vx; vy += rhs.vy; vz += rhs.vz; return *this; }
+        Vec3Long operator-(const Vec3Long& rhs) const { return Vec3Long(vx - rhs.vx, vy - rhs.vy, vz - rhs.vz); }
+        Vec3Long& operator-=(const Vec3Long& rhs) { vx -= rhs.vx; vy -= rhs.vy; vz -= rhs.vz; return *this; }
+        Vec3Long operator*(int scalar) const { return Vec3Long(vx * scalar, vy * scalar, vz * scalar); }
+        Vec3Long& operator*=(int scalar) { vx *= scalar; vy *= scalar; vz *= scalar; return *this; }
+        Vec3Long operator-() const { return Vec3Long(-vx, -vy, -vz); }
 };
 
 Vec3Short Vec3Short::FromLong(const Vec3Long& longVec) { return Vec3Short((short)longVec.vx, (short)longVec.vy, (short)longVec.vz); }

@@ -1,5 +1,6 @@
 #include "Global.h"
 #include "OrderingTable.h"
+#include "Math.h"
 
 #include <stdio.h>
 
@@ -75,10 +76,17 @@ namespace Debug
 		PrintFooter();
 	}
 
-	void PrintSvector(const SVECTOR* pVec, const char* pName)
+	void PrintVec3Short(const Vec3Short* pVec, const char* pName)
 	{
-		PrintHeaderToName("SVECTOR", pName);
+		PrintHeaderToName("Vec3Short", pName);
 		printf(": %hd, %hd, %hd\n", pVec->vx, pVec->vy, pVec->vz);
+		PrintFooter();
+	}
+
+	void PrintVec3Long(const Vec3Long* pVec, const char* pName)
+	{
+		PrintHeaderToName("Vec3Long", pName);
+		printf(": %ld, %ld, %ld\n", pVec->vx, pVec->vy, pVec->vz);
 		PrintFooter();
 	}
 

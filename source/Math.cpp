@@ -20,6 +20,10 @@ const Vec3Short& Vec3Short::Right = g_Vec3ShortRight;
 const Vec3Short& Vec3Short::Up = g_Vec3ShortUp;
 const Vec3Short& Vec3Short::Forward = g_Vec3ShortForward;
 
+const Vec3Long g_Vec3LongZero = Vec3Long(0, 0, 0);
+
+const Vec3Long& Vec3Long::Zero = g_Vec3LongZero;
+
 const Matrix g_MatrixIdentity = CreateIdentityMatrix();
 
 const Matrix& Matrix::Identity = g_MatrixIdentity;
