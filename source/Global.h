@@ -11,7 +11,13 @@
 
 #define FORCE_INLINE __attribute__((always_inline))
 
-#define OT_LENGTH (512)
+#define OT_LENGTH_POWER (9)
+#define OT_LENGTH (1 << OT_LENGTH_POWER)
+#define MAX_DRAW_DIST_POWER (13)
+#define OTZ_SHIFT (MAX_DRAW_DIST_POWER - OT_LENGTH_POWER)
+
+#define GTE_ONE_POWER 12
+#define GTE_ONE 4096
 
 #define SCREEN_WIDTH (320)
 #define SCREEN_HEIGHT (240)
@@ -22,9 +28,9 @@
 // Custom replacements of the crappy ones provided by the BIOS
 namespace Memory
 {
-    void* Move(void* pDest, const void* pSrc, int nBytes);
-    void* Copy(void* pDest, const void* pSrc, int nBytes);
-    void* Set(void* pDest, int value, int nBytes);
+    void* Move(void* pDest, const void* pSrc, int nBytes); // memmove
+    void* Copy(void* pDest, const void* pSrc, int nBytes); // memcpy
+    void* Set(void* pDest, int value, int nBytes); // memset
 }
 namespace String
 {

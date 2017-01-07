@@ -148,7 +148,7 @@ void Update(void)
 	if (controllerType != Input::CONTROLLER_NONE)
 	{
 		int xMove = 0, zMove = 0;
-		static const int moveScalar = 10;
+		static const int moveScalar = 40;
 
 		if (Input::ButtonDown(Input::BUTTON_DLEFT, 0)) xMove -= moveScalar;
 		if (Input::ButtonDown(Input::BUTTON_DRIGHT, 0)) xMove += moveScalar;
@@ -157,12 +157,12 @@ void Update(void)
 
 		Matrix* pMtx = pCamera->GetCameraMatrix();
 		Vec3Long offset;
-		offset.vx = (pMtx->m[0][0] * xMove) >> 12;
-		offset.vy = (pMtx->m[0][1] * xMove) >> 12;
-		offset.vz = (pMtx->m[0][2] * xMove) >> 12;
-		offset.vx += (pMtx->m[2][0] * zMove) >> 12;
-		offset.vy += (pMtx->m[2][1] * zMove) >> 12;
-		offset.vz += (pMtx->m[2][2] * zMove) >> 12;
+		offset.vx = (pMtx->m[0][0] * xMove) / GTE_ONE;
+		offset.vy = (pMtx->m[0][1] * xMove) / GTE_ONE;
+		offset.vz = (pMtx->m[0][2] * xMove) / GTE_ONE;
+		offset.vx += (pMtx->m[2][0] * zMove) / GTE_ONE;
+		offset.vy += (pMtx->m[2][1] * zMove) / GTE_ONE;
+		offset.vz += (pMtx->m[2][2] * zMove) / GTE_ONE;
 		pCamera->m_Position += offset;
 		pCamera->m_bDirty = true;
 

@@ -76,7 +76,7 @@ namespace OxMesh
             }
 
             // Default option values
-            outArgs.scaleFactor = 64;
+            outArgs.scaleFactor = 256;
             outArgs.bQuiet = false;
 
             foreach (string arg in args)

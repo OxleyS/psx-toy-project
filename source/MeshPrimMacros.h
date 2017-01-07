@@ -39,6 +39,7 @@ if (attr.flags & MeshAttr::MESHATTR_DOUBLESIDED) \
     otz = RotAverage3(&pPositions[0], &pPositions[1], &pPositions[2], \
         (long*)&pOutPrim->x0, (long*)&pOutPrim->x1, (long*)&pOutPrim->x2, \
         &p, &flag); \
+    otz >>= OTZ_SHIFT; \
     pOrderTbl->AddPrim(pOutPrim, otz); \
 } \
 else \
@@ -46,6 +47,7 @@ else \
     clipVal = RotAverageNclip3(&pPositions[0], &pPositions[1], &pPositions[2], \
         (long*)&pOutPrim->x0, (long*)&pOutPrim->x1, (long*)&pOutPrim->x2, \
         &p, &otz, &flag); \
+    otz >>= OTZ_SHIFT; \
     if (clipVal > 0) pOrderTbl->AddPrim(pOutPrim, otz); \
 }
 
@@ -56,6 +58,7 @@ if (attr.flags & MeshAttr::MESHATTR_DOUBLESIDED) \
     otz = RotAverage4(&pPositions[0], &pPositions[1], &pPositions[2], &pPositions[3], \
         (long*)&pOutPrim->x0, (long*)&pOutPrim->x1, (long*)&pOutPrim->x2, (long*)&pOutPrim->x3, \
         &p, &flag); \
+    otz >>= OTZ_SHIFT; \
     pOrderTbl->AddPrim(pOutPrim, otz); \
 } \
 else \
@@ -63,6 +66,7 @@ else \
     clipVal = RotAverageNclip4(&pPositions[0], &pPositions[1], &pPositions[2], &pPositions[3], \
         (long*)&pOutPrim->x0, (long*)&pOutPrim->x1, (long*)&pOutPrim->x2, (long*)&pOutPrim->x3, \
         &p, &otz, &flag); \
+    otz >>= OTZ_SHIFT; \
     if (clipVal > 0) pOrderTbl->AddPrim(pOutPrim, otz); \
 }
 
