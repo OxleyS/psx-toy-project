@@ -34,7 +34,7 @@
 
 			<dir name="asset">
 				<dir name="oxm">				
-					<file name="test.oxm" type="data" source="asset\testchar.oxm"/>
+					<file name="yordood.oxm" type="data" source="asset\yordood.oxm"/>
 					<file name="testlvl.oxm" type="data" source="asset\testlvl.oxm"/>
 				</dir>
 

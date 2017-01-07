@@ -8,7 +8,7 @@ class TestObject : public GameObject
 {
     public:
 
-    TestObject(const char* pMeshName = "TEST.OXM");
+    TestObject(const char* pMeshName = "YORDOOD.OXM");
 };
 
 #endif
