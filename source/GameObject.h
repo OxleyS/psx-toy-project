@@ -1,6 +1,8 @@
 #ifndef _GAMEOBJECT_H_
 #define _GAMEOBJECT_H_
 
+#define INVALID_GAMEOBJ_ID (0xFF)
+
 #include "Global.h"
 
 class Camera;
@@ -11,7 +13,6 @@ struct GORenderData
 {
     Camera* pCamera;
     FrameBuffer* pFrameBuf;
-    int frameBufIdx;
 };
 
 class GameObject
@@ -21,8 +22,9 @@ class GameObject
     GameObject();
 
     virtual void Update();
-    virtual void Draw(GORenderData* pRenderData);
+    virtual void Draw(const GORenderData& renderData);
 
+    u_char m_Id;
     GCRender* m_pGCRender;
 };
 

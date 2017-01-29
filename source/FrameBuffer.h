@@ -10,11 +10,12 @@ class FrameBuffer
 
 	FrameBuffer();
 
-	void Initialize(int xOffset, int yOffset);
+	void Initialize(int index, int xOffset, int yOffset);
 
 	OrderingTable m_Ot;
 	DRAWENV m_DrawEnv;
 	DISPENV m_DispEnv;
+	int m_Index;
 };
 
 #endif

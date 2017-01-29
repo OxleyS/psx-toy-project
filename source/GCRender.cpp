@@ -11,15 +11,15 @@ GCRender::GCRender()
     m_WorldMtx = Matrix::Identity;
 }
 
-void GCRender::DrawMesh(GORenderData* pRenderData)
+void GCRender::DrawMesh(const GORenderData& renderData)
 {
     Matrix mtx;
 
     if (!m_pMesh) return;
     
-    m_WorldMtx.Mul(*pRenderData->pCamera->GetCameraMatrix(), mtx);
+    m_WorldMtx.Mul(*renderData.pCamera->GetCameraMatrix(), mtx);
 	SetRotMatrix(&mtx);
 	SetTransMatrix(&mtx);
 
-	m_pMesh->Draw(pRenderData->frameBufIdx, &pRenderData->pFrameBuf->m_Ot);
+	m_pMesh->Draw(renderData.pFrameBuf->m_Index, &renderData.pFrameBuf->m_Ot);
 }

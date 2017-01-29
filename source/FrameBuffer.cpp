@@ -2,11 +2,12 @@
 
 FrameBuffer::FrameBuffer() : m_Ot(0)
 {
-
 }
 
-void FrameBuffer::Initialize(int xOffset, int yOffset)
+void FrameBuffer::Initialize(int index, int xOffset, int yOffset)
 {
+	m_Index = index;
+
 	SetDefDrawEnv(&m_DrawEnv, xOffset, yOffset, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	DISPENV& dispEnv = m_DispEnv;

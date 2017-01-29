@@ -15,6 +15,7 @@
 #include "Camera.h"
 #include "GameObject.h"
 #include "GCRender.h"
+#include "World.h"
 
 u_long __ramsize   = 0x00200000; // force 2 megabytes of RAM
 u_long __stacksize = 0x00007FF0; // force (almost) 32 kilobytes of stack
@@ -23,7 +24,6 @@ const u_char g_Debug = 1;
 
 FrameBuffer g_FrameBuffers[2];
 FrameBuffer* g_pCurFrameBuf = g_FrameBuffers;
-u_char g_CurFrameBufIdx = 0;
 
 static u_long g_FrameBufOtEntries[2][OT_LENGTH];
 
@@ -33,9 +33,8 @@ enum VideoMode
 };
 static VideoMode g_VideoMode;
 
-Camera* pCamera;
-GameObject* pGameObject;
-GameObject* pLevelObj;
+static Camera* g_pCamera;
+static World g_World;
 
 struct MeshTriGourTex
 {
@@ -114,8 +113,8 @@ void Initialize(void)
 	SetGeomOffset(SCREEN_CENTER_X, SCREEN_CENTER_Y);
 	SetDispMask(1);
 
-	g_FrameBuffers[0].Initialize(0, 0);
-	g_FrameBuffers[1].Initialize(0, 256);
+	g_FrameBuffers[0].Initialize(0, 0, 0);
+	g_FrameBuffers[1].Initialize(1, 0, 256);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -125,19 +124,26 @@ void Initialize(void)
 		g_FrameBuffers[i].m_Ot.Clear();
 	}
 
-	pCamera = new Camera;
-	pCamera->m_Position.vy = -50;
-	pCamera->m_bDirty = true;
-
 	DrawSync(0);
 	VSync(0);
 	SwapBuffers();
 
-	pGameObject = new TestObject;
-	pGameObject->m_pGCRender->m_WorldMtx.t[2] = 500;
+	bool bAdded;
 
-	pLevelObj = new TestObject("TESTLVL.OXM");
+	g_pCamera = new Camera;
+	bAdded = g_World.AddObject(g_pCamera);
+	assert(bAdded);
+
+	GameObject* pGameObject = new TestObject;
+	pGameObject->m_pGCRender->m_WorldMtx.t[2] = 500;
+	bAdded = g_World.AddObject(pGameObject);
+	assert(bAdded);
+
+	GameObject* pLevelObj = new TestObject("TESTLVL.OXM");
 	pLevelObj->m_pGCRender->m_WorldMtx.t[2] = 500;
+	pLevelObj->m_pGCRender->m_WorldMtx.t[1] = 50;
+	bAdded = g_World.AddObject(pLevelObj);
+	assert(bAdded);
 }
 
 void Update(void)
@@ -155,7 +161,7 @@ void Update(void)
 		if (Input::ButtonDown(Input::BUTTON_DUP, 0)) zMove += moveScalar;
 		if (Input::ButtonDown(Input::BUTTON_DDOWN, 0)) zMove -= moveScalar;
 
-		Matrix* pMtx = pCamera->GetCameraMatrix();
+		Matrix* pMtx = g_pCamera->GetCameraMatrix();
 		Vec3Long offset;
 		offset.vx = (pMtx->m[0][0] * xMove) / GTE_ONE;
 		offset.vy = (pMtx->m[0][1] * xMove) / GTE_ONE;
@@ -163,15 +169,18 @@ void Update(void)
 		offset.vx += (pMtx->m[2][0] * zMove) / GTE_ONE;
 		offset.vy += (pMtx->m[2][1] * zMove) / GTE_ONE;
 		offset.vz += (pMtx->m[2][2] * zMove) / GTE_ONE;
-		pCamera->m_Position += offset;
-		pCamera->m_bDirty = true;
+		g_pCamera->m_Position += offset;
 
-		if (Input::ButtonDown(Input::BUTTON_SQ, 0)) pCamera->m_Yaw -= 10;
-		if (Input::ButtonDown(Input::BUTTON_O, 0)) pCamera->m_Yaw += 10;
-		if (Input::ButtonDown(Input::BUTTON_TRI, 0)) pCamera->m_Pitch += 10;
-		if (Input::ButtonDown(Input::BUTTON_X, 0)) pCamera->m_Pitch -= 10;
+		if (Input::ButtonDown(Input::BUTTON_SQ, 0)) g_pCamera->m_Yaw -= 10;
+		if (Input::ButtonDown(Input::BUTTON_O, 0)) g_pCamera->m_Yaw += 10;
+		if (Input::ButtonDown(Input::BUTTON_TRI, 0)) g_pCamera->m_Pitch += 10;
+		if (Input::ButtonDown(Input::BUTTON_X, 0)) g_pCamera->m_Pitch -= 10;
+
+		g_pCamera->m_bDirty = true;
 	}
-	pCamera->ClampRotations();
+	g_pCamera->ClampRotations();
+
+	g_World.Update();
 }
 
 void SetupDraw(void)
@@ -181,26 +190,20 @@ void SetupDraw(void)
 
 void BuildDrawCommands(void)
 {
-	GORenderData renderData;
-	renderData.pCamera = pCamera;
-	renderData.frameBufIdx = g_CurFrameBufIdx;
-	renderData.pFrameBuf = g_pCurFrameBuf;
-
-	pGameObject->Draw(&renderData);
-	pLevelObj->Draw(&renderData);
+	g_World.Draw(g_pCamera, g_pCurFrameBuf);
 }
 
 void IssueDraw(void)
 {
-	int prevBufIdx = g_CurFrameBufIdx ^ 0x1;
+	int prevBufIdx = g_pCurFrameBuf->m_Index ^ 0x1;
 	g_FrameBuffers[prevBufIdx].m_Ot.IssueToGpu();
 }
 
 void SwapBuffers(void)
 {
 	PutDispEnv(&g_pCurFrameBuf->m_DispEnv);
-	g_CurFrameBufIdx ^= 0x1;
-	g_pCurFrameBuf = &g_FrameBuffers[g_CurFrameBufIdx];
+	int newFrameIdx = g_pCurFrameBuf->m_Index ^ 0x1;
+	g_pCurFrameBuf = &g_FrameBuffers[newFrameIdx];
 	PutDrawEnv(&g_pCurFrameBuf->m_DrawEnv);
 	ClearImage(&g_pCurFrameBuf->m_DrawEnv.clip, 25, 25, 25);
 }
