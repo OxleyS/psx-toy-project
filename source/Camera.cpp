@@ -1,4 +1,7 @@
 #include "Camera.h"
+#include "Player.h"
+#include "GCRender.h"
+#include "Input.h"
 
 Camera::Camera()
 {
@@ -27,15 +30,48 @@ Matrix* Camera::GetCameraMatrix()
     {
         Vec3Short rotAmt(m_Pitch, m_Yaw, m_Roll);
         RotMatrixYXZ_gte(&rotAmt, &m_CameraMtx);
+
+        Vec3Long right = Vec3Long::FromShort(m_CameraMtx.GetRight());
+        Vec3Long up = Vec3Long::FromShort(m_CameraMtx.GetUp());
+        Vec3Long forward = Vec3Long::FromShort(m_CameraMtx.GetForward());
+
         TransposeMatrix(&m_CameraMtx, &m_CameraMtx);
 
-        Vec3Long xformed;
-        ApplyMatrixLV(&m_CameraMtx, &m_Position, &xformed);
-        xformed = -xformed;
-        TransMatrix(&m_CameraMtx, &xformed);
+        // TODO: I'm sure this can be optimized somehow
+        m_CameraMtx.t[0] = -(right.Dot(m_Position) / GTE_ONE);
+        m_CameraMtx.t[1] = -(up.Dot(m_Position) / GTE_ONE);
+        m_CameraMtx.t[2] = -(forward.Dot(m_Position) / GTE_ONE);
 
         m_bDirty = false;
     }
 
     return &m_CameraMtx;
+}
+
+void Camera::Update()
+{
+    if (m_bDebugMode) DebugUpdate();
+}
+
+void Camera::DebugUpdate()
+{
+    int xMove = 0, zMove = 0;
+    static const int moveScalar = 40;
+
+    if (Input::ButtonDown(Input::BUTTON_DLEFT, 0)) xMove -= moveScalar;
+    if (Input::ButtonDown(Input::BUTTON_DRIGHT, 0)) xMove += moveScalar;
+    if (Input::ButtonDown(Input::BUTTON_DUP, 0)) zMove += moveScalar;
+    if (Input::ButtonDown(Input::BUTTON_DDOWN, 0)) zMove -= moveScalar;
+
+    Matrix& mtx = *GetCameraMatrix();
+    Vec3Long offset;
+    offset.vx = (mtx.m[0][0] * xMove);
+    offset.vy = (mtx.m[0][1] * xMove);
+    offset.vz = (mtx.m[0][2] * xMove);
+    offset.vx += (mtx.m[2][0] * zMove);
+    offset.vy += (mtx.m[2][1] * zMove);
+    offset.vz += (mtx.m[2][2] * zMove);
+
+    m_Position += offset / GTE_ONE;
+    m_bDirty = true;
 }

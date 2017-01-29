@@ -45,6 +45,8 @@ class Color : public CVECTOR
 {
 };
 
+class Player;
+
 class OrderingTable;
 class Vec3Short;
 class Vec3Long;

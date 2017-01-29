@@ -35,21 +35,10 @@ void Matrix::ToIdentityRot()
 
 void Matrix::MulInPlace(const Matrix& other)
 {
-	// Multiplies just the rotation part of the matrix
-	MulMatrix(this, (Matrix*)&other);
-
-	// Handle the translation part
-	ApplyMatrixLV((Matrix*)&other, (VECTOR*)t, (VECTOR*)t);
+	CompMatrixLV((MATRIX*)this, (MATRIX*)&other, this);
 }
 
 void Matrix::Mul(const Matrix& other, Matrix& out)
 {
-	// Multiplies just the rotation part of the matrix
-	MulMatrix0(this, (Matrix*)&other, &out);
-
-	// Handle the translation part
-	ApplyMatrixLV((Matrix*)&other, (VECTOR*)t, (VECTOR*)out.t);
-	out.t[0] += other.t[0]; // TODO: Is this how it's supposed to be done?
-	out.t[1] += other.t[1];
-	out.t[2] += other.t[2];
+	CompMatrixLV((MATRIX*)this, (MATRIX*)&other, &out);
 }

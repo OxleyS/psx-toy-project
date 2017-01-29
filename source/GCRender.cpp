@@ -17,7 +17,7 @@ void GCRender::DrawMesh(const GORenderData& renderData)
 
     if (!m_pMesh) return;
     
-    m_WorldMtx.Mul(*renderData.pCamera->GetCameraMatrix(), mtx);
+    renderData.pCamera->GetCameraMatrix()->Mul(m_WorldMtx, mtx);
 	SetRotMatrix(&mtx);
 	SetTransMatrix(&mtx);
 

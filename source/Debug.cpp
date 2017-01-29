@@ -65,14 +65,13 @@ namespace Debug
 		PrintFooter();
 	}
 
-	void PrintMatrix(const MATRIX* pMtx, const char* pName)
+    void PrintMatrix(const Matrix* pMtx, const char* pName)
 	{
 		PrintHeader("Matrix", pName);
-		printf("%d\t%d\t%d\n%d\t%d\t%d\n%d\t%d\t%d\n%ld\t%ld\t%ld\n",
-			pMtx->m[0][0], pMtx->m[0][1], pMtx->m[0][2],
-			pMtx->m[1][0], pMtx->m[1][1], pMtx->m[1][2],
-			pMtx->m[2][0], pMtx->m[2][1], pMtx->m[2][2],
-			pMtx->t[0], pMtx->t[1], pMtx->t[2]);
+		printf("X\tY\tZ\tT\n%d\t%d\t%d\t%ld\n%d\t%d\t%d\t%ld\n%d\t%d\t%d\t%ld\n",
+			pMtx->m[0][0], pMtx->m[0][1], pMtx->m[0][2], pMtx->t[0],
+			pMtx->m[1][0], pMtx->m[1][1], pMtx->m[1][2], pMtx->t[1],
+			pMtx->m[2][0], pMtx->m[2][1], pMtx->m[2][2], pMtx->t[2]);
 		PrintFooter();
 	}
 

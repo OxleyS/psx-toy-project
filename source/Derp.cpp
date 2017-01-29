@@ -16,6 +16,7 @@
 #include "GameObject.h"
 #include "GCRender.h"
 #include "World.h"
+#include "Player.h"
 
 u_long __ramsize   = 0x00200000; // force 2 megabytes of RAM
 u_long __stacksize = 0x00007FF0; // force (almost) 32 kilobytes of stack
@@ -132,16 +133,21 @@ void Initialize(void)
 
 	g_pCamera = new Camera;
 	bAdded = g_World.AddObject(g_pCamera);
+	g_pCamera->m_Position = Vec3Long(0, -300, -5500);
+	g_pCamera->m_bDirty = true;
 	assert(bAdded);
 
-	GameObject* pGameObject = new TestObject;
-	pGameObject->m_pGCRender->m_WorldMtx.t[2] = 500;
-	bAdded = g_World.AddObject(pGameObject);
+	Player* pPlayer = new Player;
+	RotMatrixY(500, &pPlayer->m_pGCRender->m_WorldMtx);
+	pPlayer->m_pGCRender->m_WorldMtx.SetTrans(Vec3Long(0, 0, 500));
+	
+	bAdded = g_World.AddObject(pPlayer);
 	assert(bAdded);
+	pPlayer->SetFollowCamera(g_pCamera);
 
 	GameObject* pLevelObj = new TestObject("TESTLVL.OXM");
-	pLevelObj->m_pGCRender->m_WorldMtx.t[2] = 500;
-	pLevelObj->m_pGCRender->m_WorldMtx.t[1] = 50;
+	RotMatrixY(100, &pLevelObj->m_pGCRender->m_WorldMtx);
+	pLevelObj->m_pGCRender->m_WorldMtx.SetTrans(Vec3Long(0, 50, 500));
 	bAdded = g_World.AddObject(pLevelObj);
 	assert(bAdded);
 }
@@ -153,30 +159,13 @@ void Update(void)
 	Input::ControllerType controllerType = Input::GetControllerType(0);
 	if (controllerType != Input::CONTROLLER_NONE)
 	{
-		int xMove = 0, zMove = 0;
-		static const int moveScalar = 40;
-
-		if (Input::ButtonDown(Input::BUTTON_DLEFT, 0)) xMove -= moveScalar;
-		if (Input::ButtonDown(Input::BUTTON_DRIGHT, 0)) xMove += moveScalar;
-		if (Input::ButtonDown(Input::BUTTON_DUP, 0)) zMove += moveScalar;
-		if (Input::ButtonDown(Input::BUTTON_DDOWN, 0)) zMove -= moveScalar;
-
-		Matrix* pMtx = g_pCamera->GetCameraMatrix();
-		Vec3Long offset;
-		offset.vx = (pMtx->m[0][0] * xMove) / GTE_ONE;
-		offset.vy = (pMtx->m[0][1] * xMove) / GTE_ONE;
-		offset.vz = (pMtx->m[0][2] * xMove) / GTE_ONE;
-		offset.vx += (pMtx->m[2][0] * zMove) / GTE_ONE;
-		offset.vy += (pMtx->m[2][1] * zMove) / GTE_ONE;
-		offset.vz += (pMtx->m[2][2] * zMove) / GTE_ONE;
-		g_pCamera->m_Position += offset;
-
 		if (Input::ButtonDown(Input::BUTTON_SQ, 0)) g_pCamera->m_Yaw -= 10;
 		if (Input::ButtonDown(Input::BUTTON_O, 0)) g_pCamera->m_Yaw += 10;
 		if (Input::ButtonDown(Input::BUTTON_TRI, 0)) g_pCamera->m_Pitch += 10;
 		if (Input::ButtonDown(Input::BUTTON_X, 0)) g_pCamera->m_Pitch -= 10;
-
 		g_pCamera->m_bDirty = true;
+
+		if (Input::ButtonDown(Input::BUTTON_SELECT, 0)) g_pCamera->SetDebugMode(!g_pCamera->IsDebugMode());
 	}
 	g_pCamera->ClampRotations();
 
