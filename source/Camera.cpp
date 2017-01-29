@@ -35,7 +35,7 @@ Matrix* Camera::GetCameraMatrix()
         Vec3Long up = Vec3Long::FromShort(m_CameraMtx.GetUp());
         Vec3Long forward = Vec3Long::FromShort(m_CameraMtx.GetForward());
 
-        TransposeMatrix(&m_CameraMtx, &m_CameraMtx);
+        m_CameraMtx.TransposeRot();
 
         // TODO: I'm sure this can be optimized somehow
         m_CameraMtx.t[0] = -(right.Dot(m_Position) / GTE_ONE);
@@ -50,7 +50,7 @@ Matrix* Camera::GetCameraMatrix()
 
 void Camera::Update()
 {
-    if (m_bDebugMode) DebugUpdate();
+    if (Debug::IsDebugModeEnabled()) DebugUpdate();
 }
 
 void Camera::DebugUpdate()

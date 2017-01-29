@@ -21,8 +21,6 @@
 u_long __ramsize   = 0x00200000; // force 2 megabytes of RAM
 u_long __stacksize = 0x00007FF0; // force (almost) 32 kilobytes of stack
 
-const u_char g_Debug = 1;
-
 FrameBuffer g_FrameBuffers[2];
 FrameBuffer* g_pCurFrameBuf = g_FrameBuffers;
 
@@ -129,6 +127,9 @@ void Initialize(void)
 	VSync(0);
 	SwapBuffers();
 
+	FntLoad(960, 256);
+	SetDumpFnt(FntOpen(5, 20, 320, 240, 0, 512));
+
 	bool bAdded;
 
 	g_pCamera = new Camera;
@@ -165,7 +166,7 @@ void Update(void)
 		if (Input::ButtonDown(Input::BUTTON_X, 0)) g_pCamera->m_Pitch -= 10;
 		g_pCamera->m_bDirty = true;
 
-		if (Input::ButtonDown(Input::BUTTON_SELECT, 0)) g_pCamera->SetDebugMode(!g_pCamera->IsDebugMode());
+		if (Input::ButtonPressed(Input::BUTTON_SELECT, 0)) Debug::SetDebugModeEnabled(!Debug::IsDebugModeEnabled());
 	}
 	g_pCamera->ClampRotations();
 
@@ -180,6 +181,11 @@ void SetupDraw(void)
 void BuildDrawCommands(void)
 {
 	g_World.Draw(g_pCamera, g_pCurFrameBuf);
+	if (Debug::IsDebugModeEnabled())
+	{
+		FntPrint("DEBUG MODE");
+		FntFlush(-1);
+	}
 }
 
 void IssueDraw(void)

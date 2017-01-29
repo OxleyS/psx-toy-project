@@ -14,9 +14,6 @@ struct Camera : GameObject
 
         void ClampRotations();
         Matrix* GetCameraMatrix();
-
-        bool IsDebugMode() const { return m_bDebugMode; }
-        void SetDebugMode(bool bDebugMode) { m_bDebugMode = bDebugMode; }
         
         short m_Yaw;
         short m_Pitch;
@@ -27,7 +24,6 @@ struct Camera : GameObject
         
     private:
         void DebugUpdate();
-        bool m_bDebugMode;
 };
 
 #endif

@@ -11,9 +11,9 @@ static Matrix CreateIdentityMatrix()
 }
 
 const Vec3Short g_Vec3ShortZero = Vec3Short(0, 0, 0);
-const Vec3Short g_Vec3ShortRight = Vec3Short(1, 0, 0);
-const Vec3Short g_Vec3ShortUp = Vec3Short(0, -1, 0);
-const Vec3Short g_Vec3ShortForward = Vec3Short(0, 0, 1);
+const Vec3Short g_Vec3ShortRight = Vec3Short(GTE_ONE, 0, 0);
+const Vec3Short g_Vec3ShortUp = Vec3Short(0, -GTE_ONE, 0);
+const Vec3Short g_Vec3ShortForward = Vec3Short(0, 0, GTE_ONE);
 
 const Vec3Short& Vec3Short::Zero = g_Vec3ShortZero;
 const Vec3Short& Vec3Short::Right = g_Vec3ShortRight;

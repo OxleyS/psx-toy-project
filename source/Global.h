@@ -53,6 +53,9 @@ class Vec3Long;
 class Matrix;
 namespace Debug
 {
+    bool IsDebugModeEnabled();
+    void SetDebugModeEnabled(bool bEnabled);
+
     void PrintHeaderToName(const char* pType, const char* pName);
     void PrintHeader(const char* pType, const char* pName);
     void PrintFooter();

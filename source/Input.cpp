@@ -76,6 +76,7 @@ namespace Input
 
         for (i = 0; i < 2; i++)
         {
+            gInput.previousButtonStates[i] = gInput.controlPadStates[i].state.sixteenInput.buttonState;
             gInput.controllerStates[i] = PadGetState(i * 4);
             if (gInput.controllerStates[i] == PadStateDiscon)
                 gInput.previousButtonStates[i] = 0;

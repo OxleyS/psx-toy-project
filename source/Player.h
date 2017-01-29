@@ -17,6 +17,7 @@ class Player : public GameObject
     private:
         void ProcessInput();
         void UpdateFollowCamera();
+        void UpdateFaceTarget();
 
         Camera* m_pFollowCamera;
         Vec3Short m_TargetForward;

@@ -6,6 +6,11 @@
 
 namespace Debug
 {
+	static u_char g_Debug = false;
+
+	bool IsDebugModeEnabled() { return g_Debug; }
+    void SetDebugModeEnabled(bool bEnabled) { g_Debug = bEnabled; }
+
 	void PrintHeaderToName(const char* pType, const char* pName)
 	{
 		printf("=========================\n");

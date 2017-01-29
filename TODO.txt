@@ -1,0 +1,1 @@
+Keeping the matrix in GCRender is no bueno. It needs to move to GameObject, and Camera reworked to use that instead of its current specialized vars

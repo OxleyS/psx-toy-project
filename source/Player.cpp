@@ -21,36 +21,40 @@ Player::Player()
 
 void Player::Update()
 {
-    if (m_pFollowCamera && !m_pFollowCamera->IsDebugMode())
+    if (m_pFollowCamera && !Debug::IsDebugModeEnabled())
     {
         ProcessInput();
         UpdateFollowCamera();
     }
+
+    UpdateFaceTarget();
 }
 
 void Player::ProcessInput()
 {
     int xMove = 0, zMove = 0;
-    static const int moveScalar = 40;
+    static const int oneDirMoveScalar = 40;
+    static const int twoDirMoveScalar = 28;
 
-    if (Input::ButtonDown(Input::BUTTON_DLEFT, 0)) xMove -= moveScalar;
-    if (Input::ButtonDown(Input::BUTTON_DRIGHT, 0)) xMove += moveScalar;
-    if (Input::ButtonDown(Input::BUTTON_DUP, 0)) zMove += moveScalar;
-    if (Input::ButtonDown(Input::BUTTON_DDOWN, 0)) zMove -= moveScalar;
+    if (Input::ButtonDown(Input::BUTTON_DLEFT, 0)) xMove -= 1;
+    if (Input::ButtonDown(Input::BUTTON_DRIGHT, 0)) xMove += 1;
+    if (Input::ButtonDown(Input::BUTTON_DUP, 0)) zMove += 1;
+    if (Input::ButtonDown(Input::BUTTON_DDOWN, 0)) zMove -= 1;
 
     Matrix& playerMtx = m_pGCRender->m_WorldMtx;
     Matrix& cameraMtx = *m_pFollowCamera->GetCameraMatrix();
-    Vec3Long offset;
-    offset.vx = (cameraMtx.m[0][0] * xMove);
-    offset.vy = (cameraMtx.m[0][1] * xMove);
-    offset.vz = (cameraMtx.m[0][2] * xMove);
-    offset.vx += (cameraMtx.m[2][0] * zMove);
-    offset.vy += (cameraMtx.m[2][1] * zMove);
-    offset.vz += (cameraMtx.m[2][2] * zMove);
 
-    //m_TargetForward = offset;
+    Vec3Long moveRight = Vec3Long(cameraMtx.m[0][0], 0, cameraMtx.m[0][2]).GetNormalized();
+    Vec3Long moveForward = Vec3Long(cameraMtx.m[2][0], 0, cameraMtx.m[2][2]).GetNormalized();
 
-    playerMtx.SetTrans(playerMtx.GetTrans() + (offset / GTE_ONE));
+    if (xMove != 0 || zMove != 0)
+    {
+        int moveScalar = xMove != 0 && zMove != 0 ? twoDirMoveScalar : oneDirMoveScalar;
+        Vec3Long offset = (moveRight * xMove) + (moveForward * zMove);
+        m_TargetForward = Vec3Short::FromLong(offset.GetNormalized());
+
+        playerMtx.SetTrans(playerMtx.GetTrans() + ((offset * moveScalar) / GTE_ONE));
+    }
 }
 
 void Player::UpdateFollowCamera()
@@ -63,8 +67,43 @@ void Player::UpdateFollowCamera()
     Vec3Long followPoint = playerMtx.GetTrans();
     followPoint.vy += followHeightOffset;
 
-    Vec3Long cameraForward = Vec3Long::FromShort(cameraMtx.GetForward());
+    Vec3Long cameraForward = Vec3Long(cameraMtx.m[2][0], cameraMtx.m[2][1], cameraMtx.m[2][2]);
     Vec3Long desiredCameraPos = followPoint - ((cameraForward * followDistance) / GTE_ONE);
     m_pFollowCamera->m_Position = desiredCameraPos;
     m_pFollowCamera->m_bDirty = true;
+}
+
+void Player::UpdateFaceTarget()
+{
+    static const int distancePerFrame = 1000;
+
+    Vec3Short curForward = m_pGCRender->m_WorldMtx.GetForward();
+    Vec3Short difference;
+    difference = m_TargetForward - curForward;
+
+    if (difference.LengthSq() < distancePerFrame * distancePerFrame)
+        m_pGCRender->m_WorldMtx.SetForward(m_TargetForward);
+    else 
+    {
+        // Degenerate case?
+        if (m_TargetForward.Dot(curForward) < -16700000)
+        {
+            // Fudge the vector to a direction to rotate
+            curForward += Vec3Short(10, 10, 10);
+        }
+        LoadAverageShort12(&curForward, &m_TargetForward, 4096 - distancePerFrame, distancePerFrame, &curForward);
+    }
+
+    // Set the new look vector
+    curForward.Normalize();
+    m_pGCRender->m_WorldMtx.SetForward(curForward);
+
+    // Cross product to get the other two vectors
+    // TODO: MatrixNormal()?
+    Vec3Long longForward = Vec3Long::FromShort(curForward);
+    Vec3Long right = Vec3Long(0, GTE_ONE, 0).CrossFixed(longForward);
+    right.Normalize();
+    Vec3Long up = longForward.CrossFixed(right);
+    m_pGCRender->m_WorldMtx.SetRight(Vec3Short::FromLong(right));
+    m_pGCRender->m_WorldMtx.SetUp(up.GetNormalShort());
 }
