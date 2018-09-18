@@ -17,6 +17,7 @@
 #include "GCRender.h"
 #include "World.h"
 #include "Player.h"
+#include "Sphere.h"
 
 u_long __ramsize   = 0x00200000; // force 2 megabytes of RAM
 u_long __stacksize = 0x00007FF0; // force (almost) 32 kilobytes of stack
@@ -46,13 +47,13 @@ struct MeshTriGourTex
 MeshTriGourTex plane[2] =
 {
 	{
-		{ 128, 128, 128 }, { 128, 128, 128 }, { 128, 128, 128 },
-		{ -150, 64, -150, 0 }, { -150, 64, 150, 0 }, { 150, 64, -150, 0 },
+		Color(128, 128, 128), Color(128, 128, 128), Color(128, 128, 128),
+		Vec3Short(-150, 64, -150), Vec3Short(-150, 64, 150), Vec3Short(150, 64, -150),
 		{ 0, 64 }, { 0, 0 }, { 64, 64 }, 0, 0
 	},
 	{ 
-		{ 128, 128, 128 }, { 128, 128, 128 }, { 128, 128, 128 },
-		{ -150, 64, 150, 0 }, { 150, 64, 150, 0 }, { 150, 64, -150, 0 },
+		Color(128, 128, 128), Color(128, 128, 128), Color(128, 128, 128),
+		Vec3Short(-150, 64, 150), Vec3Short(150, 64, 150), Vec3Short(150, 64, -150),
 		{ 0, 0 }, { 64, 0 }, { 64, 64} , 0, 0
 	}
 };
@@ -130,6 +131,8 @@ void Initialize(void)
 	FntLoad(960, 256);
 	SetDumpFnt(FntOpen(5, 20, 320, 240, 0, 512));
 
+	InitializeSphereMesh();
+
 	bool bAdded;
 
 	g_pCamera = new Camera;
@@ -147,6 +150,7 @@ void Initialize(void)
 	pPlayer->SetFollowCamera(g_pCamera);
 
 	GameObject* pLevelObj = new TestObject("TESTLVL.OXM");
+	pLevelObj->m_pGCRender->m_pMesh = &g_SphereMesh;
 	RotMatrixY(100, &pLevelObj->m_pGCRender->m_WorldMtx);
 	pLevelObj->m_pGCRender->m_WorldMtx.SetTrans(Vec3Long(0, 50, 500));
 	bAdded = g_World.AddObject(pLevelObj);

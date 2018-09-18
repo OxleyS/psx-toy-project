@@ -18,6 +18,7 @@ class Player : public GameObject
         void ProcessInput();
         void UpdateFollowCamera();
         void UpdateFaceTarget();
+        void TestCollision();
 
         Camera* m_pFollowCamera;
         Vec3Short m_TargetForward;

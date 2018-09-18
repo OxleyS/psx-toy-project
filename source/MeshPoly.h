@@ -15,9 +15,9 @@ namespace MeshPoly
         MESHPL_SMOOTH
     };
 
-    typedef CVECTOR Color;
-    typedef SVECTOR Position;
-    typedef SVECTOR Normal;
+    typedef ::Color Color;
+    typedef ::Vec3Short Position;
+    typedef ::Vec3Short Normal;
     struct UVCoords { u_char u, v; };
 
     // If flat lighting:

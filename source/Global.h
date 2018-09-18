@@ -18,6 +18,8 @@
 
 #define GTE_ONE_POWER 12
 #define GTE_ONE 4096
+#define GTE_ONE_OVER_TWO 2048
+#define GTE_ONE_OVER_FOUR 1024
 
 #define SCREEN_WIDTH (320)
 #define SCREEN_HEIGHT (240)
@@ -43,6 +45,9 @@ namespace String
 
 class Color : public CVECTOR
 {
+    public:
+        Color() {}
+        Color(u_char r, u_char g, u_char b) { this->r = r; this->g = g; this->b = b; }
 };
 
 class Player;
@@ -74,5 +79,7 @@ namespace Debug
     void PrintPolyGT4(const POLY_GT4* pPoly, const char* pName);
     void PrintColor(const Color* pColor, const char* pName);
 }
+
+#include "Math.h"
 
 #endif

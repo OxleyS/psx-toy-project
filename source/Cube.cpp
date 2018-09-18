@@ -4,9 +4,9 @@
 #include "Mesh.h"
 
 #define S 64
-#define RED { 255, 0, 0 }
-#define GREEN { 0, 255, 0 }
-#define BLUE { 0, 0, 255 } 
+#define RED Color(255, 0, 0)
+#define GREEN Color(0, 255, 0)
+#define BLUE Color(0, 0, 255)
 
 struct MeshTriGour
 {
@@ -19,85 +19,85 @@ MeshTriGour g_CubeTris[] =
     // Top face
     { 
         RED, GREEN, BLUE,
-        { -S, -S, -S, 0 },
-	    { -S, -S, S, 0 },
-	    { S, -S, -S, 0 }
+        Vec3Short(-S, -S, -S),
+	    Vec3Short(-S, -S, S),
+	    Vec3Short(S, -S, -S)
     },
 	{
         GREEN, RED, BLUE,
-        { -S, -S, S, 0 },
-	    { S, -S, S, 0 },
-	    { S, -S, -S, 0 }
+        Vec3Short(-S, -S, S),
+	    Vec3Short(S, -S, S),
+	    Vec3Short(S, -S, -S)
     },
 
     // Bottom face
     {  
         GREEN, RED, BLUE,
-        { -S, S, S, 0 },
-	    { -S, S, -S, 0 },
-	    { S, S, -S, 0 }
+        Vec3Short(-S, S, S),
+	    Vec3Short(-S, S, -S),
+	    Vec3Short(S, S, -S)
     },
 	{
         GREEN, BLUE, RED,
-        { -S, S, S, 0 },
-        { S, S, -S, 0 },
-	    { S, S, S, 0 }
+        Vec3Short(-S, S, S),
+        Vec3Short(S, S, -S),
+	    Vec3Short(S, S, S)
     },
 
     // Front face
     {
         RED, GREEN, BLUE,
-        { -S, S, -S, 0 },
-        { -S, -S, -S, 0 },
-        { S, S, -S, 0 }
+        Vec3Short(-S, S, -S),
+        Vec3Short(-S, -S, -S),
+        Vec3Short(S, S, -S)
     },
     {
         GREEN, RED, BLUE,
-        { -S, -S, -S, 0 },
-        { S, -S, -S, 0 },
-        { S, S, -S, 0 }
+        Vec3Short(-S, -S, -S),
+        Vec3Short(S, -S, -S),
+        Vec3Short(S, S, -S)
     },
 
     // Back face
     {
         GREEN, RED, BLUE,
-        { -S, -S, S, 0 },
-        { -S, S, S, 0 },
-        { S, S, S, 0 }
+        Vec3Short(-S, -S, S),
+        Vec3Short(-S, S, S),
+        Vec3Short(S, S, S)
     },
     {
         GREEN, BLUE, RED,
-        { -S, -S, S, 0 },
-        { S, S, S, 0 },
-        { S, -S, S, 0 }
+        Vec3Short(-S, -S, S),
+        Vec3Short(S, S, S),
+        Vec3Short(S, -S, S)
     },
 
     // Left face
     {
         GREEN, RED, BLUE,
-        { -S, S, S, 0 },
-        { -S, -S, S, 0 },
-        { -S, -S, -S, 0 }
+        Vec3Short(-S, S, S),
+        Vec3Short(-S, -S, S),
+        Vec3Short(-S, -S, -S)
     },
     {
         BLUE, RED, GREEN,
-        { -S, -S, -S, 0 },
-        { -S, S, -S, 0 },
-        { -S, S, S, 0 }
+        Vec3Short(-S, -S, -S),
+        Vec3Short(-S, S, -S),
+        Vec3Short(-S, S, S)
     },
 
     // Right face
     {
         GREEN, RED, BLUE,
-        { S, S, -S, 0 },
-        { S, -S, -S, 0 },
-        { S, -S, S, 0 }
+        Vec3Short(S, S, -S),
+        Vec3Short(S, -S, -S),
+        Vec3Short(S, -S, S)
     },
     {
         BLUE, RED, GREEN,
-        { S, -S, S, 0 },
-        { S, S, S, 0 },
-        { S, S, -S, 0 }
+        Vec3Short(S, -S, S),
+        Vec3Short(S, S, S),
+        Vec3Short(S, S, -S)
     },
 };
 int g_nCubeTris = sizeof(g_CubeTris) / sizeof(MeshTriGour);

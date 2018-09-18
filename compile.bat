@@ -1,11 +1,25 @@
 @echo off
 setlocal
 
+rem Be sure psyq\bin\psyq.ini, and cdbuild\derp.yml has the correct paths set!
+set PSYQ_BASE=H:\develop\psyq
+
+rem Stuff that used to be in system-wide envvars
+set COMPILER_PATH=%PSYQ_BASE%\bin
+set C_INCLUDE_PATH=%PSYQ_BASE%\include
+set C_PLUS_INCLUDE_PATH=%PSYQ_BASE%\include
+set LIBRARY_PATH=%PSYQ_BASE%\lib
+set PSX_PATH=%PSYQ_BASE%\bin
+set PSYQ_PATH=%PSYQ_BASE%\bin
+set PATH=%PATH%;%PSYQ_BASE%\bin
+set GO32="DPMISTACK 1000000"
+set G032TMP=C:\TEMP
+
 set BUILDDIR=build
 set SOURCEDIR=source
 set DISTDIR=dist
-set MMGMOBJDIR=C:\psyq\beta\mmgm\OBJ
-set LIBDIR=C:\psyq\lib
+set MMGMOBJDIR=%PSYQ_BASE%\beta\mmgm\OBJ
+set LIBDIR=%PSYQ_BASE%\lib
 set MKPSXISODIR=tools
 
 echo Clearing out previous build files...

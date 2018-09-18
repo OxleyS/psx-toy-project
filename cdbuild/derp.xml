@@ -25,7 +25,7 @@
 			data_preparer	="MKPSXISO"
 		/>
 
-		<license file="C:\psyq\cdgen\LCNSFILE\licensea.dat"/>
+		<license file="H:\develop\psyq\cdgen\LCNSFILE\licensea.dat"/>
 		
 		<directory_tree>
 

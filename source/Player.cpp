@@ -28,6 +28,8 @@ void Player::Update()
     }
 
     UpdateFaceTarget();
+
+    TestCollision();
 }
 
 void Player::ProcessInput()
@@ -106,4 +108,9 @@ void Player::UpdateFaceTarget()
     Vec3Long up = longForward.CrossFixed(right);
     m_pGCRender->m_WorldMtx.SetRight(Vec3Short::FromLong(right));
     m_pGCRender->m_WorldMtx.SetUp(up.GetNormalShort());
+}
+
+void Player::TestCollision()
+{
+    
 }
