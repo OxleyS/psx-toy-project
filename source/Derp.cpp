@@ -142,8 +142,10 @@ void Initialize(void)
 	assert(bAdded);
 
 	Player* pPlayer = new Player;
+	// TODO: When this is commented out, immediately moving backwards triggers
+	// an edge case of the turning algorithm! No bueno
 	RotMatrixY(500, &pPlayer->m_pGCRender->m_WorldMtx);
-	pPlayer->m_pGCRender->m_WorldMtx.SetTrans(Vec3Long(0, 0, 500));
+	pPlayer->m_pGCRender->m_WorldMtx.SetTrans(Vec3Long(0, 0, -2 * WORLD_UNIT));
 	
 	bAdded = g_World.AddObject(pPlayer);
 	assert(bAdded);

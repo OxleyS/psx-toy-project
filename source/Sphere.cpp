@@ -33,8 +33,8 @@ void InitializeSphereMesh()
         int yAngle = (GTE_ONE_OVER_TWO * i) / (NUM_SPHERE_POINTS - 1);
         int nextYAngle = (GTE_ONE_OVER_TWO * (i + 1)) / (NUM_SPHERE_POINTS - 1);
 
-        int curY = ccos(yAngle);
-        int nextY = ccos(nextYAngle);
+        int curY = -ccos(yAngle);
+        int nextY = -ccos(nextYAngle);
 
         int curColor = curY > 0 ? (curY >> 4) : ((-curY) >> 4);
         int nextColor = nextY > 0 ? (nextY >> 4) : ((-nextY) >> 4);
@@ -53,8 +53,8 @@ void InitializeSphereMesh()
             SphereQuad* pQuad = (SphereQuad*)pCur;
             pQuad->color.r = 255; pQuad->color.g = finalColor; pQuad->color.b = finalColor;
             pQuad->pos[0].vx = curX; pQuad->pos[0].vy = curY; pQuad->pos[0].vz = curZ;
-            pQuad->pos[1].vx = curX; pQuad->pos[1].vy = nextY; pQuad->pos[1].vz = curZ;
-            pQuad->pos[2].vx = nextX; pQuad->pos[2].vy = curY; pQuad->pos[2].vz = nextZ;
+            pQuad->pos[1].vx = nextX; pQuad->pos[1].vy = curY; pQuad->pos[1].vz = nextZ;
+            pQuad->pos[2].vx = curX; pQuad->pos[2].vy = nextY; pQuad->pos[2].vz = curZ;
             pQuad->pos[3].vx = nextX; pQuad->pos[3].vy = nextY; pQuad->pos[3].vz = nextZ;
             pCur += sizeof(SphereQuad) / sizeof(u_long);
         }

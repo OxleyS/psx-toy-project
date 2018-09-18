@@ -35,8 +35,8 @@ void Player::Update()
 void Player::ProcessInput()
 {
     int xMove = 0, zMove = 0;
-    static const int oneDirMoveScalar = 40;
-    static const int twoDirMoveScalar = 28;
+    static const int oneDirMoveScalar = 520;
+    static const int twoDirMoveScalar = 368;
 
     if (Input::ButtonDown(Input::BUTTON_DLEFT, 0)) xMove -= 1;
     if (Input::ButtonDown(Input::BUTTON_DRIGHT, 0)) xMove += 1;
@@ -63,8 +63,8 @@ void Player::UpdateFollowCamera()
 {
     const Matrix& playerMtx = m_pGCRender->m_WorldMtx;
     const Matrix& cameraMtx = *m_pFollowCamera->GetCameraMatrix();
-    static const int followDistance = 3000;
-    static const int followHeightOffset = -600;
+    static const int followDistance = 10 * WORLD_UNIT;
+    static const int followHeightOffset = -2 * WORLD_UNIT;
 
     Vec3Long followPoint = playerMtx.GetTrans();
     followPoint.vy += followHeightOffset;
